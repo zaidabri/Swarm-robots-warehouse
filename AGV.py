@@ -198,7 +198,7 @@ class Agent:
 
 
         # Find next step
-        for i in range(10):
+        for i in range(20):
 
             x = self.currentPosition[0]
             y = self.currentPosition[1]

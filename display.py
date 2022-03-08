@@ -9,8 +9,9 @@ from matplotlib.collections import PatchCollection
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import animation
+from matplotlib.animation import FuncAnimation, PillowWriter 
 import matplotlib.animation as manimation
-import argparse
+import argparse as args
 import math
 
 Colors = ['orange', 'blue', 'green']
@@ -54,7 +55,7 @@ class Animation:
     #  x, y = o[0], o[1]
     #  self.patches.append(Rectangle((x - 0.5, y - 0.5), 1, 1, facecolor='red', edgecolor='red'))
 
-    # prova prova 
+    
 
     for o in map["map"]["pickupStation"]:
         x, y = o[0], o[1]
@@ -62,7 +63,7 @@ class Animation:
 
     for o in map["map"]["deliveryStation"]:
         x, y = o[0], o[1]
-        self.patches.append(Rectangle((x - 0.5, y - 0.5), 1, 1, facecolor='yellow', edgecolor='yellow'))
+        self.patches.append(Rectangle((x, y), 1, 1, facecolor='yellow', edgecolor='yellow'))
 
     # create agents:
     self.T = 0
@@ -71,7 +72,7 @@ class Animation:
     #   self.patches.append(Rectangle((d["goal"][0] - 0.25, d["goal"][1] - 0.25), 0.5, 0.5, facecolor=Colors[0], edgecolor='black', alpha=0.5))
     for d, i in zip(map["agents"], range(0, len(map["agents"]))):
       name = d["name"]
-      self.agents[name] = Circle((d["start"][0], d["start"][1]), 0.3, facecolor=Colors[0], edgecolor='black')
+      self.agents[name] = Circle((d["start"][0], d["start"][0]), 0.5, facecolor=Colors[0], edgecolor='black')
       self.agents[name].original_face_color = Colors[0]
       self.patches.append(self.agents[name])
       self.T = max(self.T, schedule["schedule"][name][-1]["t"])
@@ -96,7 +97,7 @@ class Animation:
     self.anim.save(
       file_name,
       "ffmpeg",
-      fps=10 * speed,
+      fps=20 * speed,
       dpi=200),
       # savefig_kwargs={"pad_inches": 0, "bbox_inches": "tight"})
 
@@ -175,9 +176,11 @@ if __name__ == "__main__":
 
 
   animation = Animation(map, schedule)
-  animation.show()
-  # if args.video:
-  #   animation.save(args.video, args.speed)
-  # else:
-  #   animation.show()
-  # animation.show()
+  animation.save("animationv1.mp4", 2.5)
+  #animation.show()  --> to visualize it watch the x2.5 .mp4 file
+  
+#  if args.video:
+#   animation.save(args.video, args.speed)
+#  else:
+ #   animation.show()
+  #  animation.show()
