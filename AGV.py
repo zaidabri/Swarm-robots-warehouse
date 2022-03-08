@@ -162,8 +162,8 @@ class Agent:
                (y >= 0) and (y < self.map.shape[0])
 
     # Avoid obstacles
-    def no_obstacle(self, x, y):
-        return self.map[x][y] != "*"
+    #def no_obstacle(self, x, y):
+    #    return self.map[x][y] != "*"
 
     # Avoid other agents
     def no_agent(self, x, y):
@@ -224,7 +224,7 @@ class Agent:
                         y = y - 1
 
             # Check if move is possible. TODO Check if position is same as before
-            if self.is_in_map(x,y) and self.no_obstacle(x,y) and self.no_agent(x,y):
+            if self.is_in_map(x,y)  and self.no_agent(x,y):  # and self.no_obstacle(x,y)
                 self.currentPosition = [x, y]
                 self.state = Agent_State._Active
                 break

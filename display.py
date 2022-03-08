@@ -50,9 +50,9 @@ class Animation:
     # self.ax.axis('off')
 
     self.patches.append(Rectangle((xmin, ymin), xmax - xmin, ymax - ymin, facecolor='none', edgecolor='red'))
-    for o in map["map"]["obstacles"]:
-      x, y = o[0], o[1]
-      self.patches.append(Rectangle((x - 0.5, y - 0.5), 1, 1, facecolor='red', edgecolor='red'))
+    #for o in map["map"]["obstacles"]:
+    #  x, y = o[0], o[1]
+    #  self.patches.append(Rectangle((x - 0.5, y - 0.5), 1, 1, facecolor='red', edgecolor='red'))
 
     for o in map["map"]["pickupStation"]:
         x, y = o[0], o[1]

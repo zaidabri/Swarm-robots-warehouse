@@ -19,7 +19,7 @@ map:
     #    - !!python/tuple [7, 8]
     #    - !!python/tuple [5, 5]
     #    - !!python/tuple [4, 5]
-       - !!python/tuple [0, 5]
+    #  - !!python/tuple [3, 5]
     # - !!python/tuple [2, 1]
 
     pickupStation:
