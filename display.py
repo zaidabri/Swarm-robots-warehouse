@@ -54,6 +54,8 @@ class Animation:
     #  x, y = o[0], o[1]
     #  self.patches.append(Rectangle((x - 0.5, y - 0.5), 1, 1, facecolor='red', edgecolor='red'))
 
+    # prova prova 
+
     for o in map["map"]["pickupStation"]:
         x, y = o[0], o[1]
         self.patches.append(Rectangle((x - 0.5, y - 0.5), 1, 1, facecolor='blue', edgecolor='blue'))
