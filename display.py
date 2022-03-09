@@ -72,14 +72,14 @@ class Animation:
     #   self.patches.append(Rectangle((d["goal"][0] - 0.25, d["goal"][1] - 0.25), 0.5, 0.5, facecolor=Colors[0], edgecolor='black', alpha=0.5))
     for d, i in zip(map["agents"], range(0, len(map["agents"]))):
       name = d["name"]
-      self.agents[name] = Circle((d["start"][0], d["start"][0]), 0.5, facecolor=Colors[0], edgecolor='black')
+      self.agents[name] = Circle((d["start"][0], d["start"][0]), 1, facecolor=Colors[0], edgecolor='black')
       self.agents[name].original_face_color = Colors[0]
       self.patches.append(self.agents[name])
       self.T = max(self.T, schedule["schedule"][name][-1]["t"])
       self.agent_names[name] = self.ax.text(d["start"][0], d["start"][1], name.replace('agent', ''))
       self.agent_names[name].set_horizontalalignment('center')
       self.agent_names[name].set_verticalalignment('center')
-      self.artists.append(self.agent_names[name])
+      #self.artists.append(self.agent_names[name])  
 
     # self.ax.set_axis_off()
     # self.fig.axes[0].set_visible(False)
@@ -119,8 +119,8 @@ class Animation:
       self.agent_names[agent_name].set_position(p)
 
     # reset all colors
-    for _,agent in self.agents.items():
-      agent.set_facecolor(agent.original_face_color)
+    #for _,agent in self.agents.items():
+    #  agent.set_facecolor(agent.original_face_color)
 
     # check drive-drive collisions
     agents_array = [agent for _,agent in self.agents.items()]
@@ -176,8 +176,8 @@ if __name__ == "__main__":
 
 
   animation = Animation(map, schedule)
-  animation.save("animationv1.mp4", 2.5)
-  #animation.show()  --> to visualize it watch the x2.5 .mp4 file
+  animation.save("animationv1.mp4", 4) # choose the speed at which visualize 
+  #animation.show()  --> to visualize it watch the x4 .mp4 file
   
 #  if args.video:
 #   animation.save(args.video, args.speed)

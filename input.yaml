@@ -1,19 +1,24 @@
 agents:
--   start: [1, 18]
-    goal: [14, 1] # TODO: change into the meeting point area or point 
+-   start: [75, 10]
+    goal: [75, 10] # TODO: change into the meeting point area or point 
     name: agent0
--   start: [1, 4]
-    goal: [1, 4]
+-   start: [75, 40]
+    goal: [75, 40]
     name: agent1
--   start: [15, 1]
-    goal: [15, 1]
+-   start: [75, 80]
+    goal: [75, 80]
     name: agent2
--   start: [18, 18]
-    goal: [18, 18]
+-   start: [15, 80]
+    goal: [15, 80]
     name: agent3
-
+-   start: [15, 40]
+    goal: [15, 40]
+    name: agent4
+-   start: [15, 10]
+    goal: [15, 10]
+    name: agent5
 map:
-    dimensions: [20, 20]
+    dimensions: [100, 100]
     obstacles:
     #    - !!python/tuple [8, 8]
     #    - !!python/tuple [7, 8]
@@ -23,62 +28,69 @@ map:
     # - !!python/tuple [2, 1]
 
     pickupStation:
-        - !!python/tuple [18, 2]
+        - !!python/tuple [95, 10]
 
-        - !!python/tuple [18, 15]
+        - !!python/tuple [95, 40]
 
-        #- !!python/tuple [8, 8]
+        - !!python/tuple [95, 80]
+
+        - !!python/tuple [5, 80]
+        
+        - !!python/tuple [5, 40]
+
+        - !!python/tuple [5, 10]
+
+
+
 
     deliveryStation:
-        - !!python/tuple [10, 10]         # middle of the map as for meeting points 
+        - !!python/tuple [50, 50]         # middle of the map as for meeting points 
 order:
     orders_:
         -   id_code: o0
             timestep: 1
             requested_quantities: [1]
             pickupStation:
-                - !!python/tuple [18, 2]
+                - !!python/tuple [95, 10]
         
         -   id_code: o1
             timestep: 1
             requested_quantities: [1]
             pickupStation:
-                - !!python/tuple [18, 15]
+                - !!python/tuple [95, 40]
         
         -   id_code: o2
             timestep: 1
             requested_quantities: [1]
             pickupStation:
-                - !!python/tuple [18, 2]
+                - !!python/tuple [95, 80]
 
         -   id_code: o3
             timestep: 10
             requested_quantities: [1]
             pickupStation:
-                - !!python/tuple [18, 15]
+                - !!python/tuple [5, 80]
 
         -   id_code: o4
             timestep: 15
             requested_quantities: [1]
             pickupStation:
-                - !!python/tuple [18, 2]
+                - !!python/tuple [5, 40]
         
         -   id_code: o5
             timestep: 25
             requested_quantities: [1]
             pickupStation:
-                - !!python/tuple [18, 15]
-
-        -   id_code: o6
-            timestep: 40
-            requested_quantities: [1]
-            pickupStation:
-                - !!python/tuple [18, 2]
+                - !!python/tuple [5, 10]
+     
+       # -   id_code: o6
+        #    requested_quantities: [1]
+        #    pickupStation:
+        #        - !!python/tuple [18, 2]
             
-        -   id_code: o7
-            timestep: 40
-            requested_quantities: [1]
-            pickupStation:
-                - !!python/tuple [18, 15]
+        #-   id_code: o7
+        #    requested_quantities: [1]
+         #   pickupStation:
+         #       - !!python/tuple [18, 15]
 
 dynamic_obstacles: {}
