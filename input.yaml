@@ -44,7 +44,24 @@ map:
 
 
     deliveryStation:
-        - !!python/tuple [50, 50]         # middle of the map as for meeting points 
+        - !!python/tuple [95, 15]  
+
+        - !!python/tuple [95, 45] 
+
+        - !!python/tuple [95, 85] 
+
+        - !!python/tuple [5, 75]
+
+        - !!python/tuple [5, 35] 
+
+        - !!python/tuple [5, 15]
+
+        
+
+
+
+
+              # middle of the map as for meeting points 
 order:
     orders_:
         -   id_code: o0
@@ -52,36 +69,51 @@ order:
             requested_quantities: [1]
             pickupStation:
                 - !!python/tuple [95, 10]
+            deliveryStation:
+                - !!python/tuple [5, 35] 
+            
         
         -   id_code: o1
             timestep: 1
             requested_quantities: [1]
             pickupStation:
                 - !!python/tuple [95, 40]
+            deliveryStation:
+                - !!python/tuple [95, 15]  
         
         -   id_code: o2
             timestep: 1
             requested_quantities: [1]
             pickupStation:
                 - !!python/tuple [95, 80]
+            deliveryStation:
+            
 
         -   id_code: o3
-            timestep: 10
+            timestep: 1
             requested_quantities: [1]
             pickupStation:
                 - !!python/tuple [5, 80]
+            deliveryStation:
+                - !!python/tuple [95, 45] 
 
         -   id_code: o4
-            timestep: 15
+            timestep: 1
             requested_quantities: [1]
             pickupStation:
                 - !!python/tuple [5, 40]
+            deliveryStation:
+                - !!python/tuple [5, 75]
+
+            
         
         -   id_code: o5
-            timestep: 25
+            timestep: 1
             requested_quantities: [1]
             pickupStation:
                 - !!python/tuple [5, 10]
+            deliveryStation:
+                - !!python/tuple [5, 75]
      
        # -   id_code: o6
         #    requested_quantities: [1]
