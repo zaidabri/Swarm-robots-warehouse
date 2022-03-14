@@ -20,6 +20,10 @@ class DeliveryStation():
     def __init__(self, coordinate):
         self.coordinate = coordinate
 
+class MeetingStations():  # We added the meeting point stations am
+    def __init__(self, coordinate):
+        self.coordinate = coordinate 
+
 # TODO: add meeting point stations 
 
 class WareHouse_Env():
@@ -43,7 +47,7 @@ class WareHouse_Env():
         # Add pickupStation and deliveryStation to the map
         self.pickupStation = params["map"]["pickupStation"]
 
-        self.deliveryStation = DeliveryStation(coordinate=list(params["map"]["deliveryStation"]))
+        self.deliveryStation = DeliveryStation(coordinate=list(params["map"]["deliveryStation"])) # should be changed to the same format of pickupStation as we have several ones 
 
         # Add obstacles to the map
         #self.obstacles = params["map"]["obstacles"]
@@ -70,7 +74,7 @@ class WareHouse_Env():
             quantity = params["order"]["orders_"][i]["requested_quantities"]
             timestep_begin = params["order"]["orders_"][i]["timestep"]
             PickUP = params["order"]["orders_"][i]["pickupStation"]
-
+            # TODO: add delivery station
             order = Order(self.deliveryStation, PickUP, quantity, timestep_begin, id_code)
             print("ORDER", order.id_code, order.pickupStation, "quantity:", order.requested_quantities, "time_begin:", order.timestep_begin)
             self.order_list.append(order)
@@ -130,6 +134,9 @@ class WareHouse_Env():
                                 self.order_stats[j].timestep_end = timestep
 
                 self.map[agent.currentPosition[0], agent.currentPosition[1]] = f"D/A{agentId}"
+
+            # check if agent is at the meeting point 
+            # if both paired agents are there then --> agent 1 goes back to starting point and agent 2 goes to delivery station 
 
             # Check if the Agent at the starting point and DONE with the job
             elif self.is_in_S_station(agent) and agent.state == Agent_State._Done:

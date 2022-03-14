@@ -26,7 +26,7 @@ class Pathfinder:
 
         print("graph1",graph)
         # Change neighbour agents to 0 because they are obstacles
-
+        # except for paired agent as it is the one we need or maybe not 
 
         x = start[0]
         y = start[1]
@@ -81,7 +81,7 @@ class Pathfinder:
         print("end",end)
         graph = self.prepareGraph(graph, start)
         print("After",agentId,graph)
-        graph = graph.astype(dtype=np.int8, order="F")
+        graph = graph.astype(dtype=np.int32, order="F")
         graph = tcod.path.SimpleGraph(cost=graph,cardinal=1,diagonal=0)
         pf = tcod.path.Pathfinder(graph)
         pf.add_root(start)

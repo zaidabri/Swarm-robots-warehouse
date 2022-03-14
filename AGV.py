@@ -18,6 +18,14 @@ class Agent_State(Enum):
     _Done = 3
     _Out_of_Order = 4
 
+class Pair_state(Enum):  # treat the pair of agents as a 'special' case of agents 
+    _Off = 0
+    _Active = 1 
+    _Met = 2 
+    _Shipping = 3 
+    _Done = 4 
+    _Out_of_Order = 5 
+
 
 class Order:
     current_objective = []
@@ -56,6 +64,17 @@ class Order:
         self.state = 1
         return None
 
+###################################################################################
+
+
+# TODO: build it similarly as the Agent 
+
+class pair:
+    def __init__(self): 
+        self.initialized = True 
+
+
+#####################################################################################
 
 # TODO Agent can get an order
 # TODO Agent can carry certain amount of goods

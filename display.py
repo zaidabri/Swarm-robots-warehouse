@@ -182,5 +182,8 @@ if __name__ == "__main__":
 #  if args.video:
 #   animation.save(args.video, args.speed)
 #  else:
- #   animation.show()
-  #  animation.show()
+#   animation.show()
+#  animation.show()
+
+# we need to add a class with the meeting points as stations  and store the coordinates 
+
