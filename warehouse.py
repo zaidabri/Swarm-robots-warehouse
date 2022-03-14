@@ -52,8 +52,8 @@ class WareHouse_Env():
         # Add obstacles to the map
         self.obstacles = params["map"]["obstacles"]
 
-        #for obs in self.obstacles:
-        self.map[obs[0], obs[1]] = "*"
+        for obs in self.obstacles:
+            self.map[obs[0], obs[1]] = "*"
 
         # Add Agents to the map according to their starting postion
         self.Agents = {}
@@ -158,9 +158,9 @@ class WareHouse_Env():
 
             # check if there is a collision with obstacles TODO what to do
             elif self.check_collision_with_obs(agent):
-            self.map[agent.currentPosition[0], agent.currentPosition[1]] = f"x/A{agentId}"
-            agent.order.state = Order_State._Interrupted
-            agent.update_agent_state()
+                self.map[agent.currentPosition[0], agent.currentPosition[1]] = f"x/A{agentId}"
+                agent.order.state = Order_State._Interrupted
+                agent.update_agent_state()
 
 
             # Normal routine
@@ -225,7 +225,7 @@ class WareHouse_Env():
         return self.Agents[agentId]
 
     # TODO Collison with obs need to be a zone in the grid not one single pt
-   def check_collision_with_obs(self, agent):
+    def check_collision_with_obs(self, agent):
         for obs in self.obstacles:
             if (obs[0] == agent.currentPosition[0]) and (obs[1] == agent.currentPosition[1]):
                 return True
