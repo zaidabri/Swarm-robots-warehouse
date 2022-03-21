@@ -1,30 +1,31 @@
 from enum import Enum
+from numpy import sqrt
+from statistics import mean
+
 
 import numpy
 import yaml
 import random
 
-from AGV import Agent, Agent_State, Order, Order_State
-
-
-class Station_State(Enum):
-    _Empty = 0
-    _Full = 1
+from agent import Agent, Agent_State
+from AGV import Order, Order_State
 
 
 class PickupStation():
     def __init__(self, coordinate):
         self.coordinate = coordinate
 
+    def getCoordinate(self):
+        return self.coordinate
+
+
 class DeliveryStation():
     def __init__(self, coordinate):
         self.coordinate = coordinate
 
-class MeetingStations():  # We added the meeting point stations am
-    def __init__(self, coordinate):
-        self.coordinate = coordinate 
+    def getCoordinate(self):
+        return self.coordinate
 
-# TODO: add meeting point stations 
 
 class WareHouse_Env():
 
@@ -37,6 +38,7 @@ class WareHouse_Env():
         """
         # Load experiment parameters from the input.yaml file
         params = read_config_file(input_config_file)
+
         # Prepare for save the history to output.yaml file
         self.output = {"schedule": None}
 
@@ -44,232 +46,178 @@ class WareHouse_Env():
         self.dimensions = params["map"]["dimensions"]
         self.map = numpy.zeros(self.dimensions, dtype=object)
 
-        # Add pickupStation and deliveryStation to the map
-        self.pickupStation = params["map"]["pickupStation"]
+        # Add pickupStation to list deliveryStation to the map
+        self.pickupStations = []
+        for pickupStation in list(params["map"]["pickupStation"]):
+            self.pickupStations.append(PickupStation(coordinate=pickupStation))
 
-        self.deliveryStation = DeliveryStation(coordinate=list(params["map"]["deliveryStation"])) # should be changed to the same format of pickupStation as we have several ones 
+        # Add deliveryStation to list
+        self.deliveryStation = DeliveryStation(coordinate=tuple(params["map"]["deliveryStation"][0]))
 
         # Add obstacles to the map
-        self.obstacles = params["map"]["obstacles"]
+        self.obstacles = []
+        for obs in params["map"]["obstacles"]:
+            self.obstacles.append(obs)
 
-        for obs in self.obstacles:
-            self.map[obs[0], obs[1]] = "*"
+        # Create agents
+        self.agents = []
+        for agentId, d in enumerate(params["agents"]):
+            agent = Agent(d["name"], self.map, self.deliveryStation, position=tuple(d["start"]))
+            self.agents.append(agent)
 
-        # Add Agents to the map according to their starting postion
-        self.Agents = {}
-        for (agentId, d) in enumerate(params["agents"]):
-            agent = Agent(d["name"], self.map, self.deliveryStation, currentPosition=d["start"])
-            self.map[agent.currentPosition[0], agent.currentPosition[1]] = f"A{agentId}"
-            self.Agents[d["name"]] = agent
-            self.render_stations(agent)
-
-        #Create Orders
+        # Create Orders
         self.order_list = []
-        self.order_stats = []
-
-        for i in range(len(params["order"]["orders_"])):# Create as many orders as total_orders
-            #total_quantity = 3# For all goods
-
+        # self.order_stats = []
+        for i in range(len(params["order"]["orders_"])):  # Create as many orders as total_orders
             id_code = params["order"]["orders_"][i]["id_code"]
             quantity = params["order"]["orders_"][i]["requested_quantities"]
             timestep_begin = params["order"]["orders_"][i]["timestep"]
             PickUP = params["order"]["orders_"][i]["pickupStation"]
-            # TODO: add delivery station
-            order = Order(self.deliveryStation, PickUP, quantity, timestep_begin, id_code)
-            print("ORDER", order.id_code, order.pickupStation, "quantity:", order.requested_quantities, "time_begin:", order.timestep_begin)
+            order = Order(self.deliveryStation.getCoordinate(), PickUP[0], quantity, timestep_begin, id_code)
+            print("ORDER", order.id_code, order.pickupStation, "quantity:", order.requested_quantities, "time_begin:",
+                  order.timestep_begin)
             self.order_list.append(order)
-            self.order_stats.append(order)
-                # TODO Create orders with random requested_quantities, total order needs to be lower then total_quantity and higher then 0
-                #requested_quantity = random.randint(0, total_quantity)# For each good
+            # self.order_stats.append(order)
 
-        #self.order_stats = self.order_list
-        #print(self.order_list)
+        # Check if all agents are done
+        self._done = False
 
-        # TODO
-        self._done = [False] * len(self.Agents)
         # Render in Terminal option
-        self.rendering = render
+        self.renderMap(0)
 
     def step(self, timestep):
-        # Agents make one move, sequentially
-        if timestep == 0:
-            timestep += 1
-            return
 
-        for agentId, (_, agent) in enumerate(self.Agents.items()):
+        # Assign orders to agents
+        '''
+            CNP: Orders are distributed here. Agent bid with distance to pickup station of order.
+        '''
+        for order in self.order_list:
+            if order.get_order_state() == 0 and order.getTimestep_begin() <= timestep:
+                winner = None
+                winnerDistance = None
+                for agent in self.agents:
+                    if agent.getState() == Agent_State._Done:  # Agent is _Done
+                        distance = self.callForProposal(agent, order)
+                        if winner == None or distance < winnerDistance:
+                            winnerDistance = distance
+                            winner = agent
+                if winner != None:
+                    winner.setOrder(order, timestep, winner.getId())
+                    for i in range(len(self.order_list)):
+                        if order.getOrderId() == self.order_list[i].id_code:
+                            self.order_list[i].agent_assigned = winner.getId()
 
+        '''
+            eCNP: All agents get orders proposed, also agent who already working on an order.
+        '''
+        for order in self.order_list: #to turn off eCMP comment it out
+            if order.get_order_state() == 1 and order.getTimestep_begin() <= timestep:
+                winner = None
+                winnerDistance = None
+                for agent in self.agents:
+                    if agent.getState() == Agent_State._Done or agent.getState() == Agent_State._Picking:  # Agent is _Done
+                        distance = self.callForProposal(agent, order)
+                        if winner == None or distance < winnerDistance:
+                            winnerDistance = distance
+                            winner = agent
+                if winner != None:
+                    winner.setOrder(order, timestep, winner.getId())
+                    for i in range(len(self.order_list)):
+                        if order.getOrderId() == self.order_list[i].id_code:
+                            self.order_list[i].agent_assigned = winner.getId()
 
-            self.update_env_state()
-            agent.update_agent_state()
+        # Let agents make their moves
+        for agent in self.agents:
+            self.map[agent.getPosition()[0], agent.getPosition()[1]] = 0  # Reset position of agent
+            agent.makesMove(timestep, self.map)
+            self.renderMap(timestep)
 
-            # Assign orders to agents
-            #ACCORDING TO TIMESTPE DIOCANE
-            if self.order_list != []:
-                i=0
-                while (i < (len(self.order_list))):
-                    #print("i:",i)
-                    O = self.order_list[i]
-                    if O.timestep_begin <= timestep and (agent.state == Agent_State._Off or agent.state == Agent_State._Done) :
-                        agent.setOrder(self.order_list.pop(i), timestep, agentId)
-                        for j in range(len(self.order_stats)):
-                            if O.id_code == self.order_stats[j].id_code:
-                                self.order_stats[j].agent_assigned = agentId
-                        i=0
-                    i+=1
+        # Print for console
+        self.renderMap(timestep, False)
 
-            # Check if Agent X at the pickupstation and ready to pick
-            if self.is_in_P_station(agent) and agent.state == Agent_State._Active:
-                agent.pick_order()
-                for j in range(len(self.order_stats)):
-                            if agent.order.id_code == self.order_stats[j].id_code:
-                                self.order_stats[j].timestep_pick = timestep
+        # Save history
+        self.save_stepHistory()
 
-                self.map[agent.currentPosition[0], agent.currentPosition[1]] = f"P/A{agentId}"
-
-            # Check if the Agent at the deliverystation
-            elif self.is_in_D_station(agent) and agent.state == Agent_State._Shipping:
-                agent.deliver_order()
-                for j in range(len(self.order_stats)):
-                            if agent.order.id_code == self.order_stats[j].id_code:
-                                self.order_stats[j].timestep_end = timestep
-
-                self.map[agent.currentPosition[0], agent.currentPosition[1]] = f"D/A{agentId}"
-
-            # check if agent is at the meeting point 
-            # if both paired agents are there then --> agent 1 goes back to starting point and agent 2 goes to delivery station 
-
-            # Check if the Agent at the starting point and DONE with the job
-            elif self.is_in_S_station(agent) and agent.state == Agent_State._Done:
-                agent.go_idle()
-                self.map[agent.currentPosition[0], agent.currentPosition[1]] = f"D/A{agentId}"
-
-
-            # Check if there are collision with agent X TODO what if many agent are colliding in the same pos ?
-            elif self.check_collision(agent):
-                agentX_pos = agent.currentPosition
-                agentX = self.get_agents_by_postion(agentX_pos)[-1]
-                self.map[agent.currentPosition[0], agent.currentPosition[1]] = f"A{agentId}/A{agentX.agentId}"
-                # TODO to check what to do if collide (normaly agent --> order (to revisite))
-                agent.order.state = Order_State._Interrupted
-                agent.update_agent_state()
-                agentX.order.state = Order_State._Interrupted
-                agentX.update_agent_state()
-
-
-            # check if there is a collision with obstacles TODO what to do
-            elif self.check_collision_with_obs(agent):
-                self.map[agent.currentPosition[0], agent.currentPosition[1]] = f"x/A{agentId}"
-                agent.order.state = Order_State._Interrupted
-                agent.update_agent_state()
-
-
-            # Normal routine
-            else:
-                self.map[agent.currentPosition[0], agent.currentPosition[1]] = 0
-                if agent.state != 0:
-                    agent.makesMove(timestep)
-                self.map[agent.currentPosition[0], agent.currentPosition[1]] = f"A{agentId}"
-                agent.update_agent_state()
-
-            # Save History to  output dict
-            self.save_stepHistory()
-
-        # if self.rendering:
-        #     self.render(timestep)
+    def callForProposal(self, agent, order):
+        """
+        Return distance of agent to orders pickupstation
+        TODO doesnt consider obstacles, main should be used here.
+        """
+        return sqrt((order.getPickupStation()[0] - agent.getPosition()[0]) ** 2 + (
+                    order.getPickupStation()[1] - agent.getPosition()[1]) ** 2)
 
     # Render stations
-    def render_stations(self, agent):
-        if self.is_in_P_station(agent):
-            self.map[agent.currentPosition[0], agent.currentPosition[1]] = f"P@A{agent.agentId}"
-        else:
-            for i in range(len(self.pickupStation)):
-                P = self.pickupStation[i]
-                self.map[P[0], P[1]] = "P"
+    def renderMap(self, timestep, printBool=False):
+        """
+        Renders the map completely new everytime.
+        """
 
-        if self.is_in_D_station(agent):
-            self.map[agent.currentPosition[0], agent.currentPosition[1]] = f"D@A{agent.agentId}"
-        else:
-            self.map[self.deliveryStation.coordinate[0][0], self.deliveryStation.coordinate[0][1]] = "D"
+        # Render everything to zero
+        self.map = numpy.zeros(self.dimensions, dtype=object)
+
+        # Add obstacles
+        for obs in self.obstacles:
+            self.map[obs] = "*"
+
+        # Add delivery station
+        self.map[self.deliveryStation.getCoordinate()] = "D"
+
+        # Add pickup stations
+        for pickupStation in self.pickupStations:
+            self.map[pickupStation.getCoordinate()] = "P"
+
+        # Add agents
+        for agent in self.agents:
+            if self.is_in_P_station(agent):
+                self.map[agent.getPosition()] = f"P@A{agent.agentId}"
+            elif agent.getPosition == self.deliveryStation.getCoordinate():
+                self.map[agent.getPosition()] = f"D@A{agent.agentId}"
+            else:
+                self.map[agent.getPosition()] = f"A{agent.getId()}"
+
+        if printBool:
+            print("#################", timestep)
+            print(self.map)
+
+    def is_in_P_station(self, agent):
+        for pickupStation in self.pickupStations:
+            if pickupStation.getCoordinate() == agent.getPosition():
+                return True
+        return False
+
+    def allOrdersDone(self):
+        """
+        Return true if all orders are delivered
+        """
+        for order in self.order_list:
+            if order.get_order_state() != 3:
+                return False
+        return True
 
     def save_stepHistory(self):
         data = {}
-        for agentId, agent in self.Agents.items():
-            data[agentId] = agent.getStepsHistory()
+        for agent in self.agents:
+            data[agent.getId()] = agent.getStepsHistory()
         self.output["schedule"] = data
 
-    def is_in_D_station(self, agent):
-        return (agent.currentPosition[0] == agent.deliveryStation.coordinate[0][0]) and \
-               (agent.currentPosition[1] == agent.deliveryStation.coordinate[0][1])
-
-    def is_in_P_station(self, agent):
-        a = False
-        for i in range(len(self.pickupStation)):
-            P = self.pickupStation[i]
-            a = a or (agent.currentPosition[0] == P[0] and \
-               agent.currentPosition[1] == P[1])
-        return (a)
-
-
-    def is_in_S_station(self, agent):
-        return (agent.currentPosition[0] == agent.startingPosition[0]) and \
-               (agent.currentPosition[1] == agent.startingPosition[1])
-
-    def get_agents_by_postion(self, position):
-        tmp_dict = []
-        for agentId, agentX in self.Agents.items():
-            if (position[0] == agentX.currentPosition[0]) and (position[1] == agentX.currentPosition[1]):
-                tmp_dict.append(agentX)
-        return tmp_dict
-
-    def get_agent_by_id(self, agentId):
-        return self.Agents[agentId]
-
-    # TODO Collison with obs need to be a zone in the grid not one single pt
-    def check_collision_with_obs(self, agent):
-        for obs in self.obstacles:
-            if (obs[0] == agent.currentPosition[0]) and (obs[1] == agent.currentPosition[1]):
-                return True
-            else:
+    # Update env state to done if all agents are _Done and no more orders
+    def everythingDone(self):
+        """
+        End simulation if all orders had been delivered.
+        """
+        if self.order_list != []:
+            return False
+        for agent in self.agents:
+            # print("agent.state != Agent_State._Done", agent.state, Agent_State._Done, agent.state != Agent_State._Done)
+            if agent.state != Agent_State._Done:
                 return False
-
-    # TODO Collison with other agent need to be a zone in the grid not one single pt
-    def check_collision(self, agent):
-        tmp = False
-        for agentId, agentX in self.Agents.items():
-            if agent.agentId != agentId:
-                if (agent.currentPosition[0] == agentX.currentPosition[0]) and \
-                        (agent.currentPosition[1] == agentX.currentPosition[1]):
-                    tmp = True
-                    return tmp
-            else:
-                return tmp
-
-    # Update env state according to agent state
-    def update_env_state(self):
-        def _check_agent(agent):
-            #return (agent.state == Agent_State._Done) or (agent.state == Agent_State._Out_of_Order)
-            return (agent.state == Agent_State._Out_of_Order)
-
-        self._done = [_check_agent(v) for v in self.Agents.values()]
-
-    def rest(self, agent):
-        pass
-
-    def render(self, timestep):
-        print(f"++++++++++++++Map+++++++++++++++++")
-        print(f"timestep:{timestep}")
-        print(self.map)
-        for _, agent in self.Agents.items():
-            # self.render_sations(agent)
-            print(f"agent:{agent.agentId} , state:{agent.state.name};")
-
+        return True
 
 
 def read_config_file(config_file):
     with open(config_file, 'r') as input_file:
         try:
             params = yaml.load(input_file, Loader=yaml.FullLoader)
-            # print(map)
         except yaml.YAMLError as exc:
             print(exc)
     return params
@@ -285,25 +233,49 @@ if __name__ == "__main__":
     env = WareHouse_Env(input_config_file=input_file)
     timestep = 0
     while True:
-        env.render(timestep)
         env.step(timestep)
 
         timestep += 1
-        print(env._done)
-        if timestep > 1000 or all(env._done):
 
+        if timestep > 10000000 or env.allOrdersDone():
+            print("Done with", timestep, "timesteps.")
             break
 
-    #print(len(env.order_stats))
-    for j in range(len(env.order_stats)):
-        E = env.order_stats[j]
-        print("Order;", E.id_code, ";agent", E.agent_assigned, ";pickup;", E.pickupStation, ";d_required;", round(E.distance, 1), "; t_begin:", E.timestep_begin, "; t_pick:", E.timestep_pick, "; t_end:",  E.timestep_end, ";d_performed:", (E.timestep_end - E.timestep_pick), ";loss:", round((E.timestep_end - E.timestep_pick - E.distance), 2))
+    # Print results
+    totallist = []
+    deliverytimelist = []
+    waitingtimelist = []
+    for j in range(len(env.order_list)):
+        E = env.order_list[j]
+        print("Order;", E.id_code, "; agent", E.agent_assigned, "; agent pos:", E.agent_pos, "; pickup:",
+              E.pickupStation, "; d_required:", round(E.distance, 1), "; t_begin:", E.timestep_begin, "; t_pick:",
+              E.timestep_pick, "; t_end:", E.timestep_end, "; t_diff:", (E.timestep_pick - E.timestep_begin),
+              "; d_performed:", (E.timestep_end - E.timestep_pick), "; loss:",
+              round((E.timestep_end - E.timestep_pick - E.distance), 2))
 
         # print("Order", E.id_code, " agent", E.agent_assigned)
-        # print("pickup: ", E.pickupStation, "d_required: ", round(E.distance, 1))
+        # print("agent pos:", E.agent_pos, "pickup: ", E.pickupStation, "distance: ", round( sqrt((E.agent_pos[0] - E.pickupStation[0])**2 + (E.agent_pos[1] - E.pickupStation[1])**2), 1))
         # print("quantity:", E.requested_quantities, " t_begin:", E.timestep_begin)
-        # print("t_pick:", E.timestep_pick, " t_end: ",  E.timestep_end)
+        # print("t_begin:", E.timestep_begin, "t_pick:", E.timestep_pick, " t_end: ",  E.timestep_end)
         # print("d_performed:", (E.timestep_end - E.timestep_pick))
         # print("loss: ", round((E.timestep_end - E.timestep_pick - E.distance), 2))
+        totallist.append(E.timestep_end - E.timestep_begin)
+        waitingtimelist.append(E.timestep_pick - E.timestep_begin)
+        deliverytimelist.append(E.timestep_end - E.timestep_pick)
 
+    orderchangelist = []
+    for agent in env.agents:
+        i = 0
+        for first, second in zip(agent.order_log, agent.order_log[1 : ] + agent.order_log[ : 1]):
+            if (first != second):
+                i = i + 1
+
+        print("agent:", agent.agentId, ", number of order-changes:", agent.order_switchcount, ', unequal changes: ', i)
+        orderchangelist.append(i)
+
+    print('average order switches ' + str(mean(orderchangelist)))
     write_output_file("./output.yaml", env.output)
+    print(" avg delivery: " + str(mean(deliverytimelist)) + " avg total: " + str(
+        mean(totallist)) + " avg waitinglist: " + str(mean(waitingtimelist)))
+    filehandler = open('averagedeliverytimenow.txt', 'w')
+    filehandler.write(str(mean(totallist)))

@@ -1,17 +1,6 @@
-
-
+import random
 import numpy as np
 import tcod #python3 -m pip install --user tcod
-
-# graph = tcod.path.CustomGraph((5, 5))
-# cost = np.ones((5, 5), dtype=np.int8)
-# CARDINAL = [[0, 1, 0],[1, 0, 1],[0, 1, 0],]
-# graph.add_edges(edge_map=CARDINAL, cost=cost)
-# pf = tcod.path.Pathfinder(graph)
-# pf.add_root((0, 0))
-# pf.resolve()
-# pf.distance
-# print(pf.path_to((3, 3)))
 
 class Pathfinder:
 
@@ -24,21 +13,10 @@ class Pathfinder:
                         continue
                     graph[i][j] = 1
 
-        print("graph1",graph)
-        # Change neighbour agents to 0 because they are obstacles
-        # except for paired agent as it is the one we need or maybe not 
-
         x = start[0]
         y = start[1]
 
-        print("XY",x,y)
-
-        print(graph[x-1][y])
-        #print(graph[x+1][y])
-        print(graph[x][y-1])
-        #print(graph[x][y+1])
-
-
+        # Add agents to map
         if x - 1 >= 0:
             if isinstance(graph[x-1][y], str) and "A" in graph[x-1][y]:
                 graph[x-1][y] = 0
@@ -52,15 +30,12 @@ class Pathfinder:
             if isinstance(graph[x][y+1], str) and "A" in graph[x][y+1]:
                 graph[x][y+1] = 0
 
-        print("graph2",graph)
-
-        # Change not neighbour agents to 1 because they not obstacles
+        print(graph)
+        #Change not neighbour agents to 1 because they are not obstacles
         for i in range(len(graph)):
             for j in range(len(graph[i])):
                 if isinstance(graph[i][j], str) and "A" in graph[i][j]:
-                    graph[i][j] = 1
-
-        print("graph3",graph)
+                    graph[i][j] = 0
 
         # Change * to 0 for obstacles
         for i in range(len(graph)):
@@ -68,29 +43,62 @@ class Pathfinder:
                 if graph[i][j] == "*":
                     graph[i][j] = 0
 
-        print("graph4",graph)
+
 
         return graph
 
-    def getNextMove(self):
-        return self.x, self.y
+    def randomStep(self, graph, start):
+        print("RANDOMSTEP INPUT", start)
+        for i in range(4):
+            x = start[0]
+            y = start[1]
+            j = random.randint(0, 3)
+            print("HERE I AM",j)
+
+            if j == 0:
+                x += 1
+                if x < len(graph[0]) and graph[x][y] == 1:
+                    return x,y
+            elif j == 1:
+                x -= 1
+                if x >= 0 and graph[x][y] == 1:
+                    return x,y
+            elif j == 2:
+                y += 1
+                if y < len(graph[0]) and graph[x][y] == 1:
+                    return x,y
+            elif j == 3:
+                y -= 1
+                if y >= 0 and graph[x][y] == 1:
+                    return x,y
+        return start[0], start[1]
+
 
     def solve(self, agentId, graph, start, end):
-        print("Before",agentId,graph)
-        print("start",start)
-        print("end",end)
-        graph = self.prepareGraph(graph, start)
-        print("After",agentId,graph)
-        graph = graph.astype(dtype=np.int32, order="F")
-        graph = tcod.path.SimpleGraph(cost=graph,cardinal=1,diagonal=0)
-        pf = tcod.path.Pathfinder(graph)
+        print("main\\","agentId:",agentId, "start:", start,"end:", end)
+
+        print(graph)
+
+
+        self.x = start[0]
+        self.y = start[1]
+        preparedGraph = self.prepareGraph(graph, start)
+        preparedGraph = graph.astype(dtype=np.int8, order="F")
+
+        print(preparedGraph)
+        tcodGraph = tcod.path.SimpleGraph(cost=preparedGraph,cardinal=1,diagonal=0)
+
+        pf = tcod.path.Pathfinder(tcodGraph)
         pf.add_root(start)
         pf.resolve()
+
         solution = pf.path_to(end)
 
         if len(solution) > 1:
             self.x = np.uint32(solution[1][0]).item()
             self.y = np.uint32(solution[1][1]).item()
-            return True
+            return self.x, self.y
         else:
-            return False
+            x, y = self.randomStep(preparedGraph, start)
+            print("x and y", x, y)
+            return x, y
