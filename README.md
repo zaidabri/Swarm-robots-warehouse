@@ -1,11 +1,10 @@
 # Swarm-robots-warehouse
 Link to the report: https://www.overleaf.com/project/6225aa6a096bd9de585d9cf2 
 
-To run it from terminal:
 
-python3 display.py input.yaml output.yaml
+## Commands
+Install dependency: python3 -m pip install --user tcod<br>
+Execute simulation: python3 warehouse.py<br>
+Execute visualization: python3 visualize.py<br>
+Execute both: python3 warehouse.py && python3 visualize.py<br>
 
-Next steps: 1. robot 3 should get an order faster 
-            2. add more robots
-            3. improve the interface          
-            4. work on the collisions
