@@ -1,6 +1,8 @@
 from enum import Enum
 from numpy import sqrt
 
+
+
 class Order_State(Enum):
     _Not_Assigned = 0
     _Assigned = 1
@@ -32,6 +34,7 @@ class Order:
         self.agent_pos = agent_pos
 
     def deAssign_order(self):
+        
         '''
         Used for eCNP to remove assignment of order.
         '''

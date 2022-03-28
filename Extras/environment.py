@@ -8,7 +8,7 @@ import yaml
 import random
 
 from agent import Agent, Agent_State
-from order import Order, Order_State
+from AGV import Order, Order_State  # what is order ?  Could AGV.py be the file they refer to ? 
 
 
 class PickupStation():
@@ -52,6 +52,7 @@ class WareHouse_Env():
             self.pickupStations.append(PickupStation(coordinate=pickupStation))
 
         # Add deliveryStation to list
+        # create similar for loop as above 
         self.deliveryStation = DeliveryStation(coordinate=tuple(params["map"]["deliveryStation"][0]))
 
         # Add obstacles to the map
@@ -68,6 +69,7 @@ class WareHouse_Env():
         # Create Orders
         self.order_list = []
         # self.order_stats = []
+        # add delivery station in order details 
         for i in range(len(params["order"]["orders_"])):  # Create as many orders as total_orders
             id_code = params["order"]["orders_"][i]["id_code"]
             quantity = params["order"]["orders_"][i]["requested_quantities"]
@@ -185,6 +187,8 @@ class WareHouse_Env():
                 return True
         return False
 
+    # similar logic for meeting points 
+
     def allOrdersDone(self):
         """
         Return true if all orders are delivered
@@ -253,6 +257,7 @@ if __name__ == "__main__":
     performeddistancelist = []
     simulationtimelist = []
 
+    # add delivery station to the list 
     for j in range(len(env.order_list)):
         E = env.order_list[j]
         print("Order;", E.id_code, "; agent", E.agent_assigned, "; agent pos:", E.agent_pos, "; pickup:",

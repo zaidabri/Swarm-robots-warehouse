@@ -8,7 +8,7 @@ import yaml
 import random
 
 from agent import Agent, Agent_State
-from order import Order, Order_State
+from AGV import Order, Order_State
 
 
 class PickupStation():
