@@ -173,7 +173,7 @@ if __name__ == "__main__":
 
 
   animation = Animation(map, schedule)
-  animation.save("output",4)
+  animation.save("outVideo.mp4", 4)
   # if args.video:
   #   animation.save(args.video, args.speed)
   # else:
