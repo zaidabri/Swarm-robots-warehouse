@@ -52,7 +52,9 @@ class WareHouse_Env():
             self.pickupStations.append(PickupStation(coordinate=pickupStation))
 
         # Add deliveryStation to list
-        self.deliveryStation = DeliveryStation(coordinate=tuple(params["map"]["deliveryStation"][0]))
+        self.deliveryStations =[]
+        for deliveryStation in list(params["map"]["deliveryStation"]):
+            self.deliveryStations.append(DeliveryStation(coordinate=deliveryStation))
 
         # Add obstacles to the map
         self.obstacles = []
@@ -73,8 +75,9 @@ class WareHouse_Env():
             quantity = params["order"]["orders_"][i]["requested_quantities"]
             timestep_begin = params["order"]["orders_"][i]["timestep"]
             PickUP = params["order"]["orders_"][i]["pickupStation"]
-            order = Order(self.deliveryStation.getCoordinate(), PickUP[0], quantity, timestep_begin, id_code)
-            print("ORDER", order.id_code, order.pickupStation, "quantity:", order.requested_quantities, "time_begin:",
+            Delivery = params["order"]["orders_"][i]["deliveryStation"]
+            order = Order(Delivery[0], PickUP[0], quantity, timestep_begin, id_code) #
+            print("ORDER", order.id_code, order.pickupStation, order.deliveryStation, "quantity:", order.requested_quantities, "time_begin:",
                   order.timestep_begin)
             self.order_list.append(order)
             # self.order_stats.append(order)
@@ -142,6 +145,8 @@ class WareHouse_Env():
         """
         Return distance of agent to orders pickupstation
         TODO doesnt consider obstacles, main should be used here.
+
+        TODO -- > use this to expand it to the meeting points 
         """
         return sqrt((order.getPickupStation()[0] - agent.getPosition()[0]) ** 2 + (
                     order.getPickupStation()[1] - agent.getPosition()[1]) ** 2)
@@ -159,8 +164,8 @@ class WareHouse_Env():
         for obs in self.obstacles:
             self.map[obs] = "*"
 
-        # Add delivery station
-        self.map[self.deliveryStation.getCoordinate()] = "D"
+        for deliveryStation in self.deliveryStations:
+            self.map[self.deliveryStation.getCoordinate()] = "D"
 
         # Add pickup stations
         for pickupStation in self.pickupStations:

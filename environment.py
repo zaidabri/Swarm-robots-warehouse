@@ -53,7 +53,12 @@ class WareHouse_Env():
 
         # Add deliveryStation to list
         # create similar for loop as above 
-        self.deliveryStation = DeliveryStation(coordinate=tuple(params["map"]["deliveryStation"][0]))
+
+        ##################################################################################################
+        ## NEWLY ADDED TODO: test and debug 
+        self.deliveryStations = []
+        for deliveryStation in list(params["map"]["deliveryStation"]):
+            self.deliveryStations.append(DeliveryStation(coordinate=deliveryStation))
 
         # Add obstacles to the map
         self.obstacles = []
@@ -63,7 +68,7 @@ class WareHouse_Env():
         # Create agents
         self.agents = []
         for agentId, d in enumerate(params["agents"]):
-            agent = Agent(d["name"], self.map, self.deliveryStation, position=tuple(d["start"]))
+            agent = Agent(d["name"], self.map, position=tuple(d["start"]))
             self.agents.append(agent)
 
         # Create Orders
@@ -75,8 +80,9 @@ class WareHouse_Env():
             quantity = params["order"]["orders_"][i]["requested_quantities"]
             timestep_begin = params["order"]["orders_"][i]["timestep"]
             PickUP = params["order"]["orders_"][i]["pickupStation"]
-            order = Order(self.deliveryStation.getCoordinate(), PickUP[0], quantity, timestep_begin, id_code)
-            print("ORDER", order.id_code, order.pickupStation, "quantity:", order.requested_quantities, "time_begin:",
+            Delivery = params["order"]["orders_"][i]["deliveryStation"]  # added line 
+            order = Order(Delivery[0], PickUP[0], quantity, timestep_begin, id_code) # check --- 
+            print("ORDER", order.id_code, order.pickupStation, order.deliveryStation, "quantity:", order.requested_quantities, "time_begin:",
                   order.timestep_begin)
             self.order_list.append(order)
             # self.order_stats.append(order)
@@ -161,18 +167,25 @@ class WareHouse_Env():
         for obs in self.obstacles:
             self.map[obs] = "*"
 
-        # Add delivery station
-        self.map[self.deliveryStation.getCoordinate()] = "D"
-
         # Add pickup stations
         for pickupStation in self.pickupStations:
             self.map[pickupStation.getCoordinate()] = "P"
+
+        # Add delivery stations -- follow same logic as for pickup stations 
+        
+        for deliveryStation in self.deliveryStations:
+            self.map[deliveryStation.getCoordinate()] = "D"
+
+        # Add meeting points 
+
+
+
 
         # Add agents
         for agent in self.agents:
             if self.is_in_P_station(agent):
                 self.map[agent.getPosition()] = f"P@A{agent.agentId}"
-            elif agent.getPosition == self.deliveryStation.getCoordinate():
+            elif self.is_in_D_station(agent):  # change it ---> how ? 
                 self.map[agent.getPosition()] = f"D@A{agent.agentId}"
             else:
                 self.map[agent.getPosition()] = f"A{agent.getId()}"
@@ -185,6 +198,12 @@ class WareHouse_Env():
         for pickupStation in self.pickupStations:
             if pickupStation.getCoordinate() == agent.getPosition():
                 return True
+        return False
+
+    def is_in_D_station(self, agent):
+        for deliveryStation in self.deliveryStations:
+            if deliveryStation.getCoordinate() == agent.getPosition():
+                return True 
         return False
 
     # similar logic for meeting points 
@@ -233,7 +252,7 @@ def write_output_file(output_file, output):
 
 
 if __name__ == "__main__":
-    input_file = sys.argv[1]
+    input_file ="./input.yaml" #sys.argv[1]
     env = WareHouse_Env(input_config_file=input_file)
     timestep = 0
     while True:
@@ -261,10 +280,12 @@ if __name__ == "__main__":
     for j in range(len(env.order_list)):
         E = env.order_list[j]
         print("Order;", E.id_code, "; agent", E.agent_assigned, "; agent pos:", E.agent_pos, "; pickup:",
-              E.pickupStation, "; d_required:", round(E.distance, 1), "; t_begin:", E.timestep_begin, "; t_pick:",
+              E.pickupStation,  "; delivery:", E.deliveryStation , "; d_required:", round(E.distance, 1), "; t_begin:", E.timestep_begin, "; t_pick:",
               E.timestep_pick, "; t_end:", E.timestep_end, "; t_diff:", (E.timestep_pick - E.timestep_begin),
               "; d_performed:", (E.timestep_end - E.timestep_pick), "; loss:",
               round((E.timestep_end - E.timestep_pick - E.distance), 2))
+
+            # Add delivery station to the metrics 
 
         # print("Order", E.id_code, " agent", E.agent_assigned)
         # print("agent pos:", E.agent_pos, "pickup: ", E.pickupStation, "distance: ", round( sqrt((E.agent_pos[0] - E.pickupStation[0])**2 + (E.agent_pos[1] - E.pickupStation[1])**2), 1))
@@ -300,7 +321,7 @@ if __name__ == "__main__":
     print(" avg delivery: " + str(mean(deliverytimelist)) + " avg total: " + str(
         mean(totallist)) + " avg waitinglist: " + str(mean(waitingtimelist)))
 
-    print(sys.argv[1])
+    #print(sys.argv[1])
 
     #filehandler0 = open('averageorderswitches.txt', 'a')
     #filehandler0.write(str(mean(orderchangelist)) + '''

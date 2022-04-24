@@ -11,11 +11,11 @@ class Agent_State(Enum):
 
 class Agent:
 
-    def __init__(self, agentId, map, deliveryStation, position):
+    def __init__(self, agentId, map, position):
         self.agentId = agentId
         self.map = map
         self.pickupStation = position
-        self.deliveryStation = deliveryStation
+        self.deliveryStation = position
         self.startingPosition = position # Return here after orders are finished
         self.position = position
         self.stepsHistory = []
