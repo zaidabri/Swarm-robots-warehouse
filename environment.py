@@ -323,50 +323,64 @@ if __name__ == "__main__":
 
     #print(sys.argv[1])
 
-    #filehandler0 = open('averageorderswitches.txt', 'a')
-    #filehandler0.write(str(mean(orderchangelist)) + '''
-    #''')
-    #filehandler0.close()
-    #filehandler2 = open('maxdeliverytimeagents.txt', 'a')
-    #filehandler2.write(str(max(maxdeliverylist)) + '''
-    #''')
+    filehandler0 = open('averageorderswitches.txt', 'a')
+    filehandler0.write(str(mean(orderchangelist)))
+    filehandler0.write("\n")
+    filehandler0.close()
 
-    #filehandler2.close()
-    #filehandler3 = open('averagelosstime.txt', 'a')
-    #filehandler3.write(str(mean(losslist)) + '''
-    #''')
-    #filehandler3.close()
+    filehandler2 = open('maxdeliverytimeagents.txt', 'a')
+    filehandler2.write(str(max(maxdeliverylist)))
+    filehandler2.write("\n")
+    filehandler2.close()
 
-    #filehandler4 = open('average_d_performed.txt', 'a')
-    #filehandler4.write(str(mean(dperformedlist)) + '''
-    #''')
-    #filehandler4.close()
 
-    #filehandler5 = open('Exp_mapArea_results.txt', 'a')
+    filehandler3 = open('averagelosstime.txt', 'a')
+    filehandler3.write(str(mean(losslist)))
+    filehandler3.write("\n")
+    filehandler3.close()
+
+    filehandler4 = open('average_d_performed.txt', 'a')
+    filehandler4.write(str(mean(dperformedlist)))
+    filehandler4.write("\n")
+    filehandler4.close()
+
+    filehandler5 = open('Exp_mapArea_results.txt', 'a')
     #filehandler5.write(sys.argv[1] + '''
-    '''
+    #'''
 
-    '''
-    #)
-    # average min distance
-  #  filehandler5.write(str(mean(mindistancelist)) + '''
-   # ''')
-    #average performed distance
-    #filehandler5.write(str(mean(performeddistancelist)) + ''' 
     #''')
-    #average loss
-    #filehandler5.write(str(mean(losslist)) + '''
-    #''')
-    #max loss
-    #filehandler5.write(str(max(losslist)) + '''
-    #''')
-    #max simulation time
-    #filehandler5.write(str(max(simulationtimelist)) + '''
-    #''')
-    #average order changes
-    #filehandler5.write(str(mean(orderchangelist)) + '''
-    #''')
+    filehandler5.write("\n\n")
+    filehandler5.write("average min distance \n")
+    filehandler5.write(str(mean(mindistancelist)))
+    filehandler5.write("\n")
+
+
+    filehandler5.write("average performed distance \n")#
+    filehandler5.write(str(mean(performeddistancelist)))
+    filehandler5.write("\n")
+
+
+    filehandler5.write("average loss \n")#
+    filehandler5.write(str(mean(losslist)))
+    filehandler5.write("\n")
+
+
+    filehandler5.write("max loss \n")#
+    filehandler5.write(str(max(losslist)))
+    filehandler5.write("\n")
+
+
+    filehandler5.write("max simulation time \n")
+    filehandler5.write(str(max(simulationtimelist)))
+    filehandler5.write("\n")
+
+
+
+    filehandler5.write("average order changes \n")
+    filehandler5.write(str(mean(orderchangelist)))
+    filehandler5.write("\n")
+
   #'''
 
 
-    #filehandler5.close()
+    filehandler5.close()
