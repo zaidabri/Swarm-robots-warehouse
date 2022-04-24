@@ -9,7 +9,7 @@ Execute visualization: python3 visualize.py<br>
 Execute both: python3 warehouse.py && python3 visualize.py<br>
 
 
-## Scenario 1: non collaborative multi agent delivery 
+## Scenario 1: non collaborative multi-agent delivery 
 
 - blue = pickup stations 
 - yellow = delivery stations
@@ -20,3 +20,4 @@ Execute both: python3 warehouse.py && python3 visualize.py<br>
 https://user-images.githubusercontent.com/101090050/164981122-a18348d7-4a82-4fa0-b542-797332762318.mp4
 
 
+## Scenario 2: collaborative multi-agent delivery
