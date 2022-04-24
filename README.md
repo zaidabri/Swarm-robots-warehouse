@@ -8,3 +8,7 @@ Execute simulation: python3 warehouse.py<br>
 Execute visualization: python3 visualize.py<br>
 Execute both: python3 warehouse.py && python3 visualize.py<br>
 
+
+## Scenario 1: non collaborative multi agent delivery 
+
+https://github.com/mtilocca/Swarm-robots-warehouse/blob/main/outVideo.mp4
