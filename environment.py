@@ -342,28 +342,31 @@ if __name__ == "__main__":
     #''')
     #filehandler4.close()
 
-    filehandler5 = open('Exp_mapArea_results.txt', 'a')
-    filehandler5.write(sys.argv[1] + '''
-    ''')
+    #filehandler5 = open('Exp_mapArea_results.txt', 'a')
+    #filehandler5.write(sys.argv[1] + '''
+    '''
+
+    '''
+    #)
     # average min distance
-    filehandler5.write(str(mean(mindistancelist)) + '''
-    ''')
+  #  filehandler5.write(str(mean(mindistancelist)) + '''
+   # ''')
     #average performed distance
-    filehandler5.write(str(mean(performeddistancelist)) + ''' 
-    ''')
+    #filehandler5.write(str(mean(performeddistancelist)) + ''' 
+    #''')
     #average loss
-    filehandler5.write(str(mean(losslist)) + '''
-    ''')
+    #filehandler5.write(str(mean(losslist)) + '''
+    #''')
     #max loss
-    filehandler5.write(str(max(losslist)) + '''
-    ''')
+    #filehandler5.write(str(max(losslist)) + '''
+    #''')
     #max simulation time
-    filehandler5.write(str(max(simulationtimelist)) + '''
-    ''')
+    #filehandler5.write(str(max(simulationtimelist)) + '''
+    #''')
     #average order changes
-    filehandler5.write(str(mean(orderchangelist)) + '''
-    ''')
+    #filehandler5.write(str(mean(orderchangelist)) + '''
+    #''')
+  #'''
 
 
-
-    filehandler5.close()
+    #filehandler5.close()
