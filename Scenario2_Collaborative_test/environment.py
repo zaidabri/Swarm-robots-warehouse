@@ -21,11 +21,19 @@ class PickupStation():
 
 class DeliveryStation():
     def __init__(self, coordinate):
-        self.coordinate = coordinate
+        self.coordinate = 
+        
 
     def getCoordinate(self):
         return self.coordinate
 
+#changed
+class Meetingpoints():
+    def __init__(self, coordinate):
+        self.coordinate = coordinate
+
+    def getCoordinate(self):
+        return self.coordinate
 
 class WareHouse_Env():
 
@@ -64,6 +72,11 @@ class WareHouse_Env():
         self.obstacles = []
         for obs in params["map"]["obstacles"]:
             self.obstacles.append(obs)
+        #CHANGED
+        # Add meeting points to the map
+        self.meetingpoints = []
+        for meetingpoints in params["map"]["meetingpoints"]:
+            self.meetingpoints.append((Meetingpoints(coordinate=meetingpoints))
 
         # Create agents
         self.agents = []
@@ -81,8 +94,9 @@ class WareHouse_Env():
             timestep_begin = params["order"]["orders_"][i]["timestep"]
             PickUP = params["order"]["orders_"][i]["pickupStation"]
             Delivery = params["order"]["orders_"][i]["deliveryStation"]  # added line 
-            order = Order(Delivery[0], PickUP[0], quantity, timestep_begin, id_code) # check --- 
-            print("ORDER", order.id_code, order.pickupStation, order.deliveryStation, "quantity:", order.requested_quantities, "time_begin:",
+            MeetingPoints = params["order"]["orders_"][i]["meetingpoints"]  # added line 
+            order = Order(Delivery[0], PickUP[0], MeetingPoints[0], quantity, timestep_begin, id_code) # check --- #CHANGED
+            print("ORDER", order.id_code, order.pickupStation, order.deliveryStation, order.meetingpoints, "quantity:", order.requested_quantities, "time_begin:",
                   order.timestep_begin)
             self.order_list.append(order)
             # self.order_stats.append(order)
@@ -176,10 +190,10 @@ class WareHouse_Env():
         for deliveryStation in self.deliveryStations:
             self.map[deliveryStation.getCoordinate()] = "D"
 
+        #CHANGED
         # Add meeting points 
-
-
-
+        for meetingpoints in self.meetingpoints:
+            self.map[meetingpoints.getCoordinate()] = "M"
 
         # Add agents
         for agent in self.agents:
@@ -205,8 +219,13 @@ class WareHouse_Env():
             if deliveryStation.getCoordinate() == agent.getPosition():
                 return True 
         return False
-
+    #CHANGED
     # similar logic for meeting points 
+     def is_in_M_station(self, agent):
+        for meetingpoints in self.meetingpoints:
+            if meetingpoints.getCoordinate() == agent.getPosition():
+                return True 
+        return False
 
     def allOrdersDone(self):
         """
