@@ -26,6 +26,13 @@ class DeliveryStation():
     def getCoordinate(self):
         return self.coordinate
 
+#changed
+class Meetingpoints():
+    def __init__(self, coordinate):
+        self.coordinate = coordinate
+
+    def getCoordinate(self):
+        return self.coordinate
 
 class WareHouse_Env():
 
@@ -55,6 +62,11 @@ class WareHouse_Env():
         self.deliveryStations =[]
         for deliveryStation in list(params["map"]["deliveryStation"]):
             self.deliveryStations.append(DeliveryStation(coordinate=deliveryStation))
+        #CHANGED
+        # Add meetingpoints to list
+        self.meetingpoints =[]
+        for meetingpoints in list(params["map"]["meetingpoints"]):
+            self.meetingpoits.append(meetingpoints(coordinate=meetingpoints))
 
         # Add obstacles to the map
         self.obstacles = []
@@ -76,8 +88,9 @@ class WareHouse_Env():
             timestep_begin = params["order"]["orders_"][i]["timestep"]
             PickUP = params["order"]["orders_"][i]["pickupStation"]
             Delivery = params["order"]["orders_"][i]["deliveryStation"]
-            order = Order(Delivery[0], PickUP[0], quantity, timestep_begin, id_code) #
-            print("ORDER", order.id_code, order.pickupStation, order.deliveryStation, "quantity:", order.requested_quantities, "time_begin:",
+            MeetingPoints = params["order"]["orders_"][i]["meetingpoints"]  # added line 
+            order = Order(Delivery[0], PickUP[0],MeetingPoints[0], quantity, timestep_begin, id_code) #
+            print("ORDER", order.id_code, order.pickupStation, order.deliveryStation, order.meetingpoints, "quantity:", order.requested_quantities, "time_begin:",
                   order.timestep_begin)
             self.order_list.append(order)
             # self.order_stats.append(order)
@@ -170,6 +183,11 @@ class WareHouse_Env():
         # Add pickup stations
         for pickupStation in self.pickupStations:
             self.map[pickupStation.getCoordinate()] = "P"
+        
+        #CHANGED
+        # Add meeting points 
+        for meetingpoints in self.meetingpoints:
+            self.map[meetingpoints.getCoordinate()] = "M"
 
         # Add agents
         for agent in self.agents:
