@@ -170,10 +170,11 @@ if __name__ == "__main__":
   with open(schedule) as states_file:
     schedule = yaml.load(states_file, Loader=yaml.FullLoader)
 
-
-
   animation = Animation(map, schedule)
-  animation.save("outVideo.mp4", 4)
+  animation.show()
+  #CHANGE
+  #animation = Animation(map, schedule)
+  #animation.save("outVideo.mp4", 4)
   # if args.video:
   #   animation.save(args.video, args.speed)
   # else:
