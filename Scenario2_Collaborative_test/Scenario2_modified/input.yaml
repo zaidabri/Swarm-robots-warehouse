@@ -1,0 +1,124 @@
+agents:
+-   start: [10, 45]
+    goal: [10, 45]
+    name: agent0
+-   start: [10, 30]
+    goal: [10, 30]
+    name: agent1
+-   start: [10, 15]
+    goal: [10, 15]
+    name: agent2
+-   start: [40, 15]
+    goal: [40, 15]
+    name: agent3
+-   start: [40, 30]
+    goal: [40, 30]
+    name: agent4
+-   start: [40, 45]
+    goal: [40, 45]
+    name: agent5
+map:
+    dimensions: [51, 51]
+    obstacles:
+        - !!python/tuple [18, 20]
+        - !!python/tuple [18, 38]
+
+        - !!python/tuple [34, 20]
+        - !!python/tuple [34, 38]
+
+    # - !!python/tuple [2, 1]
+
+    pickupStation:
+        - !!python/tuple [5, 10]
+
+        - !!python/tuple [5, 20]
+
+        - !!python/tuple [5, 30]
+
+        - !!python/tuple [45, 10]
+
+        - !!python/tuple [45, 20]
+
+        - !!python/tuple [45, 30]
+
+
+
+
+    deliveryStation:
+        - !!python/tuple [5, 15]
+
+        - !!python/tuple [5, 25]
+
+        - !!python/tuple [5, 35]
+
+        - !!python/tuple [45, 15]
+
+        - !!python/tuple [45, 25]
+
+        - !!python/tuple [45, 35]
+
+
+
+
+
+order:
+    orders_:
+        -   id_code: o0
+            timestep: 1
+            requested_quantities: [1]
+            pickupStation:
+                - !!python/tuple [5, 10]  
+            deliveryStation:
+                - !!python/tuple [45, 15]
+
+
+        -   id_code: o1
+            timestep: 1
+            requested_quantities: [1]
+            pickupStation:
+                - !!python/tuple [5, 20]          
+            deliveryStation:
+                - !!python/tuple [45, 25]
+
+                
+
+        -   id_code: o2
+            timestep: 1
+            requested_quantities: [1]
+            pickupStation:
+                - !!python/tuple [5, 30]         
+            deliveryStation:
+                - !!python/tuple [45, 35]
+
+                
+        -   id_code: o3
+            timestep: 10
+            requested_quantities: [1]
+            pickupStation:
+                - !!python/tuple [45, 10]        
+            deliveryStation:
+                - !!python/tuple [5, 15]
+
+                
+
+        -   id_code: o4
+            timestep: 15
+            requested_quantities: [1]
+            pickupStation:
+                - !!python/tuple [45, 20]        
+            deliveryStation:
+                - !!python/tuple [5, 25]
+
+
+
+        -   id_code: o5
+            timestep: 25
+            requested_quantities: [1]
+            pickupStation:
+                - !!python/tuple [45, 30]          
+            deliveryStation:
+                - !!python/tuple [5, 35]
+
+                
+
+dynamic_obstacles: {}
