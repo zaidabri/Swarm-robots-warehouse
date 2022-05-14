@@ -58,8 +58,9 @@ map:
         - !!python/tuple [45, 35]
 #CHANGED
     meetingpoints:
-        - !!python/tuple [35, 20]
-        - !!python/tuple [35, 38]
+        - !!python/tuple [25, 25]
+        - !!python/tuple [25, 35]
+        - !!python/tuple [25, 45]
 
         
 

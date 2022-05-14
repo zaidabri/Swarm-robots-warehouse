@@ -61,6 +61,10 @@ class Animation:
     for o in map["map"]["deliveryStation"]:
         x, y = o[0], o[1]
         self.patches.append(Rectangle((x - 0.5, y - 0.5), 1, 1, facecolor='yellow', edgecolor='yellow'))
+    
+    for o in map["map"]["meetingpoints"]:
+        x, y = o[0], o[1]
+        self.patches.append(Rectangle((x - 0.5, y - 0.5), 1, 1, facecolor='green', edgecolor='green'))
 
     # create agents:
     self.T = 0
