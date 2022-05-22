@@ -21,7 +21,7 @@ class PickupStation():
 
 class DeliveryStation():
     def __init__(self, coordinate):
-        self.coordinate = 
+        self.coordinate = coordinate
         
 
     def getCoordinate(self):
@@ -76,7 +76,7 @@ class WareHouse_Env():
         # Add meeting points to the map
         self.meetingpoints = []
         for meetingpoints in params["map"]["meetingpoints"]:
-            self.meetingpoints.append((Meetingpoints(coordinate=meetingpoints))
+            self.meetingpoints.append((meetingpoints(coordinate=meetingpoints)))
 
         # Create agents
         self.agents = []
@@ -221,7 +221,7 @@ class WareHouse_Env():
         return False
     #CHANGED
     # similar logic for meeting points 
-     def is_in_M_station(self, agent):
+    def is_in_M_station(self, agent):
         for meetingpoints in self.meetingpoints:
             if meetingpoints.getCoordinate() == agent.getPosition():
                 return True 
