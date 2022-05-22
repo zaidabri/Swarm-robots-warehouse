@@ -271,7 +271,7 @@ def write_output_file(output_file, output):
 
 
 if __name__ == "__main__":
-    input_file ="./input.yaml" #sys.argv[1]
+    input_file ="input.yaml" #sys.argv[1]
     env = WareHouse_Env(input_config_file=input_file)
     timestep = 0
     while True:

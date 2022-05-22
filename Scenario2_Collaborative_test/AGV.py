@@ -63,6 +63,7 @@ class Order:
     def getDeliveryStation(self):
         return self.deliveryStation
 
+
     def get_objective(self):
         if self.state == 1:
             return self.pickupStation

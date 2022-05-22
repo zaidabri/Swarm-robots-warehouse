@@ -8,6 +8,8 @@ class Agent_State(Enum):
     _Done = 0
     _Picking = 1
     _Delivering = 2
+    _Meeting = 3 
+    _Met = 4 
 
 class Agent:
 
@@ -65,6 +67,8 @@ class Agent:
             self.state = Agent_State._Delivering
             self.goal = self.order.get_objective()
             #print("self.deliveryStation.coordinate34", self.goal)
+
+        ## ADD THE NEW STATES WITH 2 NEW ELIF STATEMENTS FOR COLLABORATIVE BEHAVIOR 
 
     def pick_order(self, timestep):
         self.order.set_order_state(2)
