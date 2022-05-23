@@ -67,6 +67,12 @@ class Agent:
             self.state = Agent_State._Delivering
             self.goal = self.order.get_objective()
             #print("self.deliveryStation.coordinate34", self.goal)
+        elif newState == 3: 
+            self.state = Agent_State._Meeting
+            #self.goal = self.  -- Add coordinate of meeting point, how ?? 
+        elif newState == 4: 
+            self.state = Agent_State._Met
+            self.goal = self.startingPosition
 
         ## ADD THE NEW STATES WITH 2 NEW ELIF STATEMENTS FOR COLLABORATIVE BEHAVIOR 
 
@@ -81,6 +87,11 @@ class Agent:
         self.order.timestep_end = timestep
         self.update_agent_state(0)
         #print("Order ", self.order.id_code , " delivered by agent", self.agentId)
+
+    def Meet(self, timestep):
+        self.order.set_order_state() # to be changed 
+        self.order.timestep_middle = timestep
+        self.update_agent_state(3)
 
     def setOrder(self, order, timestep, ID):
         self.order = order

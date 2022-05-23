@@ -8,6 +8,7 @@ class Order_State(Enum):
     _Assigned = 1
     _Picked  = 2
     _Delivered = 3
+    _Meeting = 4 # changed 
 
 class Order:
     current_objective = ()
@@ -23,15 +24,23 @@ class Order:
         self.agent_pos = None #agent_pos_at_timestep_pick
         self.timestep_pick = None
         self.timestep_end = None
+        self.timestep_middle = None # changed 
         self.state = state
         self.agentId = None
-        self.timestep_of_assignment = None
+        self.timestep_of_assignment = None # changed -- added as additional parameters the second agent 
+        self.collaborativeOrder = False 
+        self.meetingPoint = None 
+        self.agent2_pos = None 
+        self.agent2_Id = None 
 
     def assign_order(self, agentId, timestep, agent_pos):
         self.agentId = agentId
         self.state = 1
         self.timestep_of_assignment = timestep
         self.agent_pos = agent_pos
+
+    def collaborative_order(self, agentIds, timestep, agent_pos, meetingPoint):
+        return
 
     def deAssign_order(self):
         
@@ -63,12 +72,17 @@ class Order:
     def getDeliveryStation(self):
         return self.deliveryStation
 
+    def getMeetingPoint(self):
+        return self.meetingPoint
 
-    def get_objective(self):
+
+    def get_objective(self):  # Changed to add the 
         if self.state == 1:
             return self.pickupStation
         elif self.state == 2:
             return self.deliveryStation
+        elif self.state == 3: 
+            return self.meetingPoint
         else:
             print("exit() in order get_objective")
             exit()
