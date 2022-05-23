@@ -27,6 +27,16 @@ class DeliveryStation():
     def getCoordinate(self):
         return self.coordinate
 
+class Pair():
+    def __init__(self, agentIDs):
+        self.agent1ID = agentIDs[0]
+        self.agent2ID = agentIDs[1]
+
+    def getCoordinate(self): #TODO
+        # should return paired agents position on the map -- check agent.py for implt
+        return
+
+
 #changed
 class Meetingpoints():
     def __init__(self, coordinate):
@@ -75,8 +85,8 @@ class WareHouse_Env():
         #CHANGED
         # Add meeting points to the map
         self.meetingpoints = []
-        for meetingpoints in params["map"]["meetingpoints"]:
-            self.meetingpoints.append((meetingpoints(coordinate=meetingpoints)))
+        for meetingPoint in params["map"]["meetingPoint"]:
+            self.meetingpoints.append(meetingPoint(coordinate=meetingPoint))
 
         # Create agents
         self.agents = []
@@ -160,6 +170,15 @@ class WareHouse_Env():
         # Save history
         self.save_stepHistory()
 
+    def callForCollab():
+        return # check if delivery station x - coordinate is within a certain threshold  < 25 , if not then create pairs 
+        
+    def createPair():
+        return # the pair is created based on the agents which lay within the same horizontal line 
+
+    def findThePair(self, agent): 
+        return # shold calculate the and find other robot is on the 
+
     def callForProposal(self, agent, order):
         """
         Return distance of agent to orders pickupstation
@@ -200,6 +219,8 @@ class WareHouse_Env():
             if self.is_in_P_station(agent):
                 self.map[agent.getPosition()] = f"P@A{agent.agentId}"
             elif self.is_in_D_station(agent):  # change it ---> how ? 
+                self.map[agent.getPosition()] = f"D@A{agent.agentId}"
+            elif self.is_in_M_station(agent):
                 self.map[agent.getPosition()] = f"D@A{agent.agentId}"
             else:
                 self.map[agent.getPosition()] = f"A{agent.getId()}"
@@ -279,7 +300,7 @@ if __name__ == "__main__":
 
         timestep += 1
 
-        if timestep > 10000000 or env.allOrdersDone():
+        if timestep > 20000000 or env.allOrdersDone():
             print("Done with", timestep, "timesteps.")
             break
 
