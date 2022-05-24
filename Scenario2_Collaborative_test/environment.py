@@ -152,6 +152,7 @@ class WareHouse_Env():
                         if winner == None or distance < winnerDistance:
                             winnerDistance = distance
                             winner = agent
+                            self.pairIDs = 0 # created the first time it runs and resets per every order. 
                 if winner != None:
                     winner.setOrder(order, timestep, winner.getId())
                     for i in range(len(self.order_list)):
@@ -170,14 +171,43 @@ class WareHouse_Env():
         # Save history
         self.save_stepHistory()
 
-    def callForCollab():
-        return # check if delivery station x - coordinate is within a certain threshold  < 25 , if not then create pairs 
-        
-    def createPair():
-        return # the pair is created based on the agents which lay within the same horizontal line 
+    def callForCollab(self, agent, order):
+        # what is needed: order details, namely delivery station coordinates and assigned robot initial position 
+        if agent.getPosition()[0] > 25 and agent.getPosition()[0]< 50:
+            ctrl = 1 
+        elif agent.getPosition()[0] > 0 and agent.getPosition()[0]< 26:
+            ctrl = 0 
 
-    def findThePair(self, agent): 
-        return # shold calculate the and find other robot is on the 
+        if ctrl == 1 and order.deliveryStation[0] > 25: 
+            return False
+        elif ctrl == 1 and order.deliveryStation[0] > 25: 
+            return True 
+        elif ctrl == 0 and order.deliveryStation[0] > 25: 
+            return True
+        elif ctrl == 0 and order.deliveryStation[0] > 25: 
+            return False  
+        else: 
+            return False # check if delivery station x - coordinate is within a certain threshold  < 25 , if not then create pairs 
+        
+
+    def findThePair(self, agentRef):  # agentRef is the agent to which the order has been assigned 
+        for agent in self.agents:
+            if agentRef.getPosition()[1] == agent.getPosition()[1]:
+                return agent.agentId   # should retrun paired agent ID 
+        
+        return False
+
+    def createPair(self, agentRef):
+        
+        agent2 = self.findThePair(agentRef)
+
+        if agent2 == False:
+            return False 
+        else:
+            self.pairIDs = [agentRef.agendId, agent2.agentId] # store it 
+            return agentRef.agentId, agent2.agentId # the pair is created based on the agents which lay within the same horizontal line 
+
+
 
     def callForProposal(self, agent, order):
         """
