@@ -28,17 +28,15 @@ class DeliveryStation():
         return self.coordinate
 
 class Pair():
-    def __init__(self, agentIDs):
-        self.agent1ID = agentIDs[0]
-        self.agent2ID = agentIDs[1]
-
+    def __init__(self, agent1, agent2):
+        self.agent1 = agent1
+        self.agent2 = agent2 
     def getCoordinate(self): #TODO
-        # should return paired agents position on the map -- check agent.py for implt
-        return
+        return self.agent1.getPosition(), self.agent2.getPosition()
 
 
 #changed
-class Meetingpoints():
+class MeetingPoint():
     def __init__(self, coordinate):
         self.coordinate = coordinate
 
@@ -84,9 +82,9 @@ class WareHouse_Env():
             self.obstacles.append(obs)
         #CHANGED
         # Add meeting points to the map
-        self.meetingpoints = []
-        for meetingPoint in params["map"]["meetingPoint"]:
-            self.meetingpoints.append(meetingPoint(coordinate=meetingPoint))
+        self.meetingPoints = []
+        for meetingPoint in params["map"]["meetingPoint"]:   # works as obstacle, change it to make it work as a delivery station or Pick up station 
+            self.meetingPoints.append(MeetingPoint(coordinate = meetingPoint))   # .append(meetingPoint(coordinate = ))
 
         # Create agents
         self.agents = []
@@ -104,9 +102,9 @@ class WareHouse_Env():
             timestep_begin = params["order"]["orders_"][i]["timestep"]
             PickUP = params["order"]["orders_"][i]["pickupStation"]
             Delivery = params["order"]["orders_"][i]["deliveryStation"]  # added line 
-            MeetingPoints = params["order"]["orders_"][i]["meetingpoints"]  # added line 
-            order = Order(Delivery[0], PickUP[0], MeetingPoints[0], quantity, timestep_begin, id_code) # check --- #CHANGED
-            print("ORDER", order.id_code, order.pickupStation, order.deliveryStation, order.meetingpoints, "quantity:", order.requested_quantities, "time_begin:",
+            #MeetingPoints = params["order"]["orders_"][i]["meetingPoint"]  # added line 
+            order = Order(Delivery[0], PickUP[0], quantity, timestep_begin, id_code) # check --- #CHANGED
+            print("ORDER", order.id_code, order.pickupStation, order.deliveryStation, "quantity:", order.requested_quantities, "time_begin:",
                   order.timestep_begin)
             self.order_list.append(order)
             # self.order_stats.append(order)
@@ -208,6 +206,10 @@ class WareHouse_Env():
             return agentRef.agentId, agent2.agentId # the pair is created based on the agents which lay within the same horizontal line 
 
 
+    def BothRobotMet(self, agent1, agent2):
+        # function shold check that both robots are at the meeting points to change 'winner' 
+        return 
+
 
     def callForProposal(self, agent, order):
         """
@@ -241,8 +243,8 @@ class WareHouse_Env():
 
         #CHANGED
         # Add meeting points 
-        for meetingpoints in self.meetingpoints:
-            self.map[meetingpoints.getCoordinate()] = "M"
+        for meetingPoint in self.meetingPoints:
+            self.map[meetingPoint.getCoordinate()] = "M"  # WHY DOESNT IT LIKE M BUT P, D AND * ARE FINE ? 
 
         # Add agents
         for agent in self.agents:
@@ -273,7 +275,7 @@ class WareHouse_Env():
     #CHANGED
     # similar logic for meeting points 
     def is_in_M_station(self, agent):
-        for meetingpoints in self.meetingpoints:
+        for meetingpoints in self.meetingPoints:
             if meetingpoints.getCoordinate() == agent.getPosition():
                 return True 
         return False

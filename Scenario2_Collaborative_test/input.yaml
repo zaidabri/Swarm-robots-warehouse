@@ -27,6 +27,11 @@ map:
         - !!python/tuple [34, 38]
 
     # - !!python/tuple [2, 1]
+    meetingPoint:
+        - !!python/tuple [25, 25]
+        - !!python/tuple [25, 35]
+        - !!python/tuple [25, 15]
+
 
     pickupStation:
         - !!python/tuple [5, 10]
@@ -57,11 +62,7 @@ map:
 
         - !!python/tuple [45, 35]
 #CHANGED
-    meetingPoint:
-        - !!python/tuple [25, 25]
-        - !!python/tuple [25, 35]
-        - !!python/tuple [25, 45]
-
+    
         
 
 

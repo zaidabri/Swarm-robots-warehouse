@@ -62,7 +62,7 @@ class Animation:
         x, y = o[0], o[1]
         self.patches.append(Rectangle((x - 0.5, y - 0.5), 1, 1, facecolor='yellow', edgecolor='yellow'))
     
-    for o in map["map"]["meetingpoints"]:
+    for o in map["map"]["meetingPoint"]:
         x, y = o[0], o[1]
         self.patches.append(Rectangle((x - 0.5, y - 0.5), 1, 1, facecolor='green', edgecolor='green'))
 

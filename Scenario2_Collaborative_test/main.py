@@ -8,7 +8,7 @@ class Pathfinder:
         # Change 0, P and D to 1, because 0 are obstacles here
         for i in range(len(graph)):
             for j in range(len(graph[i])):
-                if graph[i][j] == 0 or isinstance(graph[i][j], str) and ("P" in graph[i][j] or "D" in graph[i][j]):
+                if graph[i][j] == 0 or isinstance(graph[i][j], str) and ("P" in graph[i][j] or "D" in graph[i][j] or "M" in graph[i][j]):
                     if isinstance(graph[i][j], str) and "A" in graph[i][j]:
                         continue
                     graph[i][j] = 1
