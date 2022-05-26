@@ -9,7 +9,6 @@ class Agent_State(Enum):
     _Picking = 1
     _Delivering = 2
     _Meeting = 3 
-    _Met = 4 
 
 class Agent:
 
@@ -18,6 +17,7 @@ class Agent:
         self.map = map
         self.pickupStation = position
         self.deliveryStation = position
+        self.meetingPoint = position 
         self.startingPosition = position # Return here after orders are finished
         self.position = position
         self.stepsHistory = []
@@ -69,11 +69,7 @@ class Agent:
             #print("self.deliveryStation.coordinate34", self.goal)
         elif newState == 3: 
             self.state = Agent_State._Meeting
-            #self.goal = self.  -- Add coordinate of meeting point, how ?? 
-        elif newState == 4: 
-            self.state = Agent_State._Met
-            self.goal = self.startingPosition
-
+            self.goal = self.order.get_objective() #-- Add coordinate of meeting point, how ?? 
         ## ADD THE NEW STATES WITH 2 NEW ELIF STATEMENTS FOR COLLABORATIVE BEHAVIOR 
 
     def pick_order(self, timestep):
@@ -126,6 +122,14 @@ class Agent:
             self.stepsHistory.append(temp_dict)# Save steps for visualization
             self.deliver_order(timestep)
             return self.position
+
+        elif self.state == Agent_State._Meeting and self.position == self.goal: # meet at meeting point in the middle 
+            print("MEETING HERE",self.state, Agent_State._Meeting )
+            temp_dict = {"x": self.position[0], "y": self.position[1], "t": timestep}
+            self.stepsHistory.append(temp_dict)# Save steps for visualization
+            self.deliver_order(timestep)
+            return self.position  # CHANGED 
+
 
         # Find next step
         print("self.goal)", self.goal)

@@ -13,12 +13,15 @@ class Order_State(Enum):
 class Order:
     current_objective = ()
 
-    def __init__(self, deliveryStation, pickupStation, requested_quantities, timestep_begin, id_code, state=0):
+    def __init__(self, deliveryStation, pickupStation, meetingPoint, requested_quantities, timestep_begin, id_code, state=0):
         self.id_code = id_code
         self.agent_assigned = None
         self.pickupStation = pickupStation
         self.deliveryStation = deliveryStation
+        self.meetingPoint = meetingPoint
         self.distance = sqrt((pickupStation[0] - deliveryStation[0])**2 + (pickupStation[1] - deliveryStation[1])**2)
+        self.distAG1 = sqrt((pickupStation[0] - meetingPoint[0])**2 + (pickupStation[1] - meetingPoint[1])**2)
+        self.distAG2 = sqrt((deliveryStation[0] - meetingPoint[0])**2 + (deliveryStation[1] - meetingPoint[1])**2)
         self.requested_quantities = requested_quantities
         self.timestep_begin = timestep_begin
         self.agent_pos = None #agent_pos_at_timestep_pick
@@ -38,6 +41,16 @@ class Order:
         self.state = 1
         self.timestep_of_assignment = timestep
         self.agent_pos = agent_pos
+
+    def switch_order(self, agent1ID, agent2ID, timestep, agent1_pos, agent2_pos):
+        
+        current_agentID = self.agentId
+
+        if current_agentID == agent1ID:
+            self.assign_order(self, agent2ID, timestep, agent2_pos)
+        elif current_agentID == agent2ID:
+            self.assign_order(self, agent2ID, timestep, agent2_pos)
+
 
     def collaborative_order(self, agentIds, timestep, agent_pos, meetingPoint):
         return

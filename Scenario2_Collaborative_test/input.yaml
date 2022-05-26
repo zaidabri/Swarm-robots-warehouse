@@ -30,7 +30,15 @@ map:
     meetingPoint:
         - !!python/tuple [25, 25]
         - !!python/tuple [25, 35]
+
         - !!python/tuple [25, 15]
+        - !!python/tuple [25, 5]
+
+        - !!python/tuple [25, 20]
+        - !!python/tuple [25, 40]
+
+
+
 
 
     pickupStation:
@@ -77,6 +85,8 @@ order:
                 - !!python/tuple [5, 10]  
             deliveryStation:
                 - !!python/tuple [45, 15]
+            meetingPoint:
+                - !!python/tuple [25, 15]
 
 
         -   id_code: o1
@@ -86,6 +96,10 @@ order:
                 - !!python/tuple [5, 20]          
             deliveryStation:
                 - !!python/tuple [45, 25]
+            meetingPoint:
+                - !!python/tuple [25, 40]
+
+
 
                 
 
@@ -96,6 +110,9 @@ order:
                 - !!python/tuple [5, 30]         
             deliveryStation:
                 - !!python/tuple [45, 35]
+            meetingPoint:
+                - !!python/tuple [25, 35]
+
 
                 
         -   id_code: o3
@@ -105,6 +122,9 @@ order:
                 - !!python/tuple [45, 10]        
             deliveryStation:
                 - !!python/tuple [5, 15]
+            meetingPoint:
+                - !!python/tuple [25, 5]
+
 
                 
 
@@ -115,6 +135,9 @@ order:
                 - !!python/tuple [45, 20]        
             deliveryStation:
                 - !!python/tuple [5, 25]
+            meetingPoint:
+                - !!python/tuple [25, 20]
+
 
 
 
@@ -125,6 +148,9 @@ order:
                 - !!python/tuple [45, 30]          
             deliveryStation:
                 - !!python/tuple [5, 35]
+            meetingPoint:
+                - !!python/tuple [25, 15]
+
 
                 
 
