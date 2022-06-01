@@ -36,9 +36,9 @@ class Order:
         self.agent2_pos = None 
         self.agent2_Id = None 
 
-    def assign_order(self, agentId, timestep, agent_pos):
+    def assign_order(self, agentId, timestep, agent_pos): # modify it so that it can assigned to 2 ? 
         self.agentId = agentId
-        self.state = 1
+        self.state = 1 # picking -- 
         self.timestep_of_assignment = timestep
         self.agent_pos = agent_pos
 
@@ -49,7 +49,7 @@ class Order:
         if current_agentID == agent1ID:
             self.assign_order(self, agent2ID, timestep, agent2_pos)
         elif current_agentID == agent2ID:
-            self.assign_order(self, agent2ID, timestep, agent2_pos)
+            self.assign_order(self, agent1ID, timestep, agent1_pos)
 
 
     def collaborative_order(self, agentIds, timestep, agent_pos, meetingPoint):

@@ -92,6 +92,15 @@ class WareHouse_Env():
             agent = Agent(d["name"], self.map, position=tuple(d["start"]))
             self.agents.append(agent)
 
+        self.agentsInitPos = []
+
+        for agent in self.agents: 
+            startX = agent.getPosition()[0]
+            startY = agent.getPosition()[1]
+            idAg = agent.getId()
+            self.agentsInitPos.append([idAg, startX, startY])  # storing the init position of each agent 
+
+
         # Create Orders
         self.order_list = []
         # self.order_stats = []
@@ -102,8 +111,8 @@ class WareHouse_Env():
             timestep_begin = params["order"]["orders_"][i]["timestep"]
             PickUP = params["order"]["orders_"][i]["pickupStation"]
             Delivery = params["order"]["orders_"][i]["deliveryStation"]  # added line 
-            #MeetingPoints = params["order"]["orders_"][i]["meetingPoint"]  # added line 
-            order = Order(Delivery[0], PickUP[0], quantity, timestep_begin, id_code) # check --- #CHANGED
+            MeetingPoints = params["order"]["orders_"][i]["meetingPoint"]  # added line 
+            order = Order(Delivery[0], PickUP[0], MeetingPoints[0], quantity, timestep_begin, id_code) # check --- #CHANGED
             print("ORDER", order.id_code, order.pickupStation, order.deliveryStation, "quantity:", order.requested_quantities, "time_begin:",
                   order.timestep_begin)
             self.order_list.append(order)
@@ -131,7 +140,13 @@ class WareHouse_Env():
                         if winner == None or distance < winnerDistance:
                             winnerDistance = distance
                             winner = agent
+                           
                 if winner != None:
+                    # check if order should be collaborative 
+                    if self.callForCollab(winner, order): 
+                        self.findThePair(winner)
+
+
                     winner.setOrder(order, timestep, winner.getId())
                     for i in range(len(self.order_list)):
                         if order.getOrderId() == self.order_list[i].id_code:
@@ -189,9 +204,36 @@ class WareHouse_Env():
         
 
     def findThePair(self, agentRef):  # agentRef is the agent to which the order has been assigned 
+        
+        def is_not_busy(agent):
+            if agent.getState() == 0:
+                return True
+            else:
+                return False
+
+        agentsInitPos = self.agentsInitPos # we create a copy for manipulation 
+        differences = []
+        ids = []
+        value = 0 
+        for agentPos in self.agentsInitPos:  # check initial positions 
+            value = 0
+            value = agentRef.getPosition()[1] - agentPos[2]
+            differences.append(value)
+            ids.append(agentPos[0])
+            
+        #TODO -- finish to implement the pair matching 
+        # find min difference -- check if agent is not busy, if not then return the found agent, if 
+        # agent is busy find the other one which is closest and on the other side and so on, make it in a for loop which scans it 
+            
+            
+            #if agentRef.getPosition()[1] == agentPos[agentPos][2]:  # modify it so that it can find 
+                #candidateID = agentPos[agentPos][0]  # should retrun paired agent ID 
+                
         for agent in self.agents:
-            if agentRef.getPosition()[1] == agent.getPosition()[1]:
-                return agent.agentId   # should retrun paired agent ID 
+            if candidateID == agent.getId() and agent:
+                candidate = agent
+                return candidate
+        
         
         return False
 
@@ -208,13 +250,16 @@ class WareHouse_Env():
 
     def BothRobotMet(self, agent1, agent2):
         # function shold check that both robots are at the meeting points to change 'winner' 
-        return 
+        if self.is_in_M_station(agent1) and self.is_in_M_station(agent2):
+            return True 
+        else: 
+            return False 
 
 
     def callForProposal(self, agent, order):
         """
         Return distance of agent to orders pickupstation
-        TODO doesnt consider obstacles, main should be used here.
+    
         """
         return sqrt((order.getPickupStation()[0] - agent.getPosition()[0]) ** 2 + (
                     order.getPickupStation()[1] - agent.getPosition()[1]) ** 2)

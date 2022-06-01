@@ -76,6 +76,7 @@ class Agent:
         self.order.set_order_state(2)
         self.order.timestep_pick = timestep
         self.update_agent_state(2)
+        
         #print("Order ", self.order.id_code , " picked by agent", self.agentId, ". New Goal: ", self.goal)
 
     def deliver_order(self, timestep):
@@ -95,6 +96,20 @@ class Agent:
         self.order.assign_order(self.agentId, timestep, self.position)
         #self.order.set_order_state(1)
         self.update_agent_state(1)
+
+    def DeliverAfterMeet(self, order, timestep, ID): # function for second paired robot 
+        self.order = order
+        self.deliveryStation = order.deliveryStation
+        self.order.assign_order(self.agentId, timestep, self.position)
+        #self.order.set_order_state(1)
+        self.update_agent_state(2)
+
+    def GoToMeetingPoint(self, order, timestep, ID): # function for second paired robot 
+        self.order = order 
+        self.meetingPoint= order.meetingPoint
+        self.order.assign_order(self.agentId, timestep, self.position)
+        self.update_agent_state(3)
+
 
     def setNewOrder(self, order, timestep, ID):
         '''
