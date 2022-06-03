@@ -26,6 +26,7 @@ class Agent:
         self.order_log = []
         self.order = None
         self.goal = position
+        self.Collaborating = True 
 
         self.pathfinder = Pathfinder()
 
@@ -70,7 +71,7 @@ class Agent:
         elif newState == 3: 
             self.state = Agent_State._Meeting
             self.goal = self.order.get_objective() #-- Add coordinate of meeting point, how ?? 
-        ## ADD THE NEW STATES WITH 2 NEW ELIF STATEMENTS FOR COLLABORATIVE BEHAVIOR 
+         
 
     def pick_order(self, timestep):
         self.order.set_order_state(2)
@@ -86,7 +87,7 @@ class Agent:
         #print("Order ", self.order.id_code , " delivered by agent", self.agentId)
 
     def Meet(self, timestep):
-        self.order.set_order_state() # to be changed 
+        self.order.set_order_state(4) 
         self.order.timestep_middle = timestep
         self.update_agent_state(3)
 

@@ -28,9 +28,10 @@ class DeliveryStation():
         return self.coordinate
 
 class Pair():
-    def __init__(self, agent1, agent2):
+    def __init__(self, agent1, agent2, order):
         self.agent1 = agent1
         self.agent2 = agent2 
+        self.order = order 
     def getCoordinate(self): #TODO
         return self.agent1.getPosition(), self.agent2.getPosition()
 
@@ -144,16 +145,19 @@ class WareHouse_Env():
                 if winner != None:
                     # check if order should be collaborative 
                     if self.callForCollab(winner, order): 
-                        self.findThePair(winner)
-
-
-                    winner.setOrder(order, timestep, winner.getId())
-                    for i in range(len(self.order_list)):
-                        if order.getOrderId() == self.order_list[i].id_code:
-                            self.order_list[i].agent_assigned = winner.getId()
+                        agent2 = self.findThePair(winner)
+                        if agent2 != False: 
+                            winner.Collaborating = True
+                            agent2.Collaborating = True
+                            
+                            winner.setOrder(order, timestep, winner.getId())
+                            for i in range(len(self.order_list)):
+                                if order.getOrderId() == self.order_list[i].id_code:
+                                    self.order_list[i].agent_assigned = winner.getId()
 
         '''
             eCNP: All agents get orders proposed, also agent who already working on an order.
+        '''
         '''
         for order in self.order_list: #to turn off eCMP comment it out
             if order.get_order_state() == 1 and order.getTimestep_begin() <= timestep:
@@ -165,15 +169,15 @@ class WareHouse_Env():
                         if winner == None or distance < winnerDistance:
                             winnerDistance = distance
                             winner = agent
-                            self.pairIDs = 0 # created the first time it runs and resets per every order. 
+                         # created the first time it runs and resets per every order. 
                 if winner != None:
                     winner.setOrder(order, timestep, winner.getId())
                     for i in range(len(self.order_list)):
                         if order.getOrderId() == self.order_list[i].id_code:
                             self.order_list[i].agent_assigned = winner.getId()
-
+        '''
         # Let agents make their moves
-        for agent in self.agents:
+        for agent in self.agents:  # here ? 
             self.map[agent.getPosition()[0], agent.getPosition()[1]] = 0  # Reset position of agent
             agent.makesMove(timestep, self.map)
             self.renderMap(timestep)
@@ -211,7 +215,6 @@ class WareHouse_Env():
             else:
                 return False
 
-        agentsInitPos = self.agentsInitPos # we create a copy for manipulation 
         differences = []
         ids = []
         value = 0 
@@ -224,19 +227,31 @@ class WareHouse_Env():
         #TODO -- finish to implement the pair matching 
         # find min difference -- check if agent is not busy, if not then return the found agent, if 
         # agent is busy find the other one which is closest and on the other side and so on, make it in a for loop which scans it 
-            
-            
-            #if agentRef.getPosition()[1] == agentPos[agentPos][2]:  # modify it so that it can find 
-                #candidateID = agentPos[agentPos][0]  # should retrun paired agent ID 
-                
-        for agent in self.agents:
-            if candidateID == agent.getId() and agent:
-                candidate = agent
-                return candidate
-        
-        
-        return False
 
+        minDiff = 0
+        minDiffIndex = 0
+
+        while ids and differences: 
+            for agent in self.agents:
+                minDiff = min(differences)   
+                minDiffIndex = differences.index(minDiff)
+
+                if ids[minDiffIndex] == agent.getId() and ids and differences:
+                    candidate = agent
+                    if is_not_busy(candidate):
+                        print("Pair found!", candidate.getId())
+                        return candidate 
+                    elif is_not_busy(candidate) == False:
+                        differences.remove(minDiff)
+                        ids.remove(ids[minDiffIndex])
+                elif differences != True and ids != True: # if all agents are busy then it is impossible to pair 
+                        print("All agents busy, sorry")
+        return False
+        
+        
+        
+            
+            
     def createPair(self, agentRef):
         
         agent2 = self.findThePair(agentRef)
@@ -244,8 +259,8 @@ class WareHouse_Env():
         if agent2 == False:
             return False 
         else:
-            self.pairIDs = [agentRef.agendId, agent2.agentId] # store it 
-            return agentRef.agentId, agent2.agentId # the pair is created based on the agents which lay within the same horizontal line 
+            #self.pairIDs = [[agentRef, agent2]] # store it 
+            return agentRef.getId(), agent2.agentId # the pair is created based on the agents which lay within the same horizontal line 
 
 
     def BothRobotMet(self, agent1, agent2):
@@ -289,7 +304,7 @@ class WareHouse_Env():
         #CHANGED
         # Add meeting points 
         for meetingPoint in self.meetingPoints:
-            self.map[meetingPoint.getCoordinate()] = "M"  # WHY DOESNT IT LIKE M BUT P, D AND * ARE FINE ? 
+            self.map[meetingPoint.getCoordinate()] = "M"  
 
         # Add agents
         for agent in self.agents:
