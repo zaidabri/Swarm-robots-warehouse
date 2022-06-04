@@ -27,6 +27,7 @@ class Agent:
         self.order = None
         self.goal = position
         self.Collaborating = True 
+        self.collab_order = None 
 
         self.pathfinder = Pathfinder()
 
@@ -68,7 +69,7 @@ class Agent:
             self.state = Agent_State._Delivering
             self.goal = self.order.get_objective()
             #print("self.deliveryStation.coordinate34", self.goal)
-        elif newState == 3: 
+        elif newState == 3: # differentiate between agent ref and agent 2 
             self.state = Agent_State._Meeting
             self.goal = self.order.get_objective() #-- Add coordinate of meeting point, how ?? 
          
@@ -98,6 +99,12 @@ class Agent:
         #self.order.set_order_state(1)
         self.update_agent_state(1)
 
+    def setCollabOrder(self, order): 
+        self.meetingPoint = order.meetingPoint
+        self.update_agent_state(3)
+        self.goal = order.meetingPoint()
+
+
     def DeliverAfterMeet(self, order, timestep, ID): # function for second paired robot 
         self.order = order
         self.deliveryStation = order.deliveryStation
@@ -119,7 +126,7 @@ class Agent:
         self.order.deAssign_order()
         self.setOrder(order, timestep, ID)
 
-    def makesMove(self, timestep, map):
+    def makesMove(self, timestep, map):   # function which does the magicccc 
 
         if self.state == Agent_State._Done and self.position == self.goal:
             print("DONE HERE",self.state, Agent_State._Done)

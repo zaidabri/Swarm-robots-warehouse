@@ -1,5 +1,5 @@
 from enum import Enum
-from numpy import sqrt
+from numpy import empty, sqrt
 from statistics import mean
 import sys
 
@@ -137,9 +137,9 @@ class WareHouse_Env():
                 winnerDistance = None
                 for agent in self.agents:
                     if agent.getState() == Agent_State._Done:  # Agent is _Done
-                        distance = self.callForProposal(agent, order)
-                        if winner == None or distance < winnerDistance:
-                            winnerDistance = distance
+                        #distance = self.callForProposal(agent, order)
+                        if winner == None: #or distance < winnerDistance:
+                            #winnerDistance = distance
                             winner = agent
                            
                 if winner != None:
@@ -158,6 +158,7 @@ class WareHouse_Env():
         '''
             eCNP: All agents get orders proposed, also agent who already working on an order.
         '''
+
         '''
         for order in self.order_list: #to turn off eCMP comment it out
             if order.get_order_state() == 1 and order.getTimestep_begin() <= timestep:
@@ -220,7 +221,7 @@ class WareHouse_Env():
         value = 0 
         for agentPos in self.agentsInitPos:  # check initial positions 
             value = 0
-            value = agentRef.getPosition()[1] - agentPos[2]
+            value = agentRef.getPosition()[1] - agentPos[2]  # check this TODO
             differences.append(value)
             ids.append(agentPos[0])
             
@@ -231,7 +232,7 @@ class WareHouse_Env():
         minDiff = 0
         minDiffIndex = 0
 
-        while ids and differences: 
+        while differences != empty: 
             for agent in self.agents:
                 minDiff = min(differences)   
                 minDiffIndex = differences.index(minDiff)
@@ -309,7 +310,7 @@ class WareHouse_Env():
         # Add agents
         for agent in self.agents:
             if self.is_in_P_station(agent):
-                self.map[agent.getPosition()] = f"P@A{agent.agentId}"
+                self.map[agent.getPosition()] = f"P@A{agent.agentId}"   # check what this does TODO
             elif self.is_in_D_station(agent):  # change it ---> how ? 
                 self.map[agent.getPosition()] = f"D@A{agent.agentId}"
             elif self.is_in_M_station(agent):

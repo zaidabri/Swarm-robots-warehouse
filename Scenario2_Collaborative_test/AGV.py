@@ -31,9 +31,8 @@ class Order:
         self.state = state
         self.agentId = None
         self.timestep_of_assignment = None # changed -- added as additional parameters the second agent 
+        
         self.collaborativeOrder = False 
-        self.meetingPoint = None 
-        self.agent2_pos = None 
         self.agent2_Id = None 
 
     def assign_order(self, agentId, timestep, agent_pos): # modify it so that it can assigned to 2 ? 
@@ -42,6 +41,13 @@ class Order:
         self.timestep_of_assignment = timestep
         self.agent_pos = agent_pos
 
+    def assign_orderCollab_Delivery(self, agentId, timestep, agent_pos):
+        self.agentId = agentId
+        self.state = 2 # delivering 
+        self.timestep_of_assignment = timestep 
+        self.agent_pos = agent_pos 
+
+        
     def switch_order(self, agent1ID, agent2ID, timestep, agent1_pos, agent2_pos):
         
         current_agentID = self.agentId
@@ -52,7 +58,7 @@ class Order:
             self.assign_order(self, agent1ID, timestep, agent1_pos)
 
 
-    def collaborative_order(self, agentIds, timestep, agent_pos, meetingPoint):
+    def collaborative_order(self, agentId, agent2Id, timestep, agent_pos, meetingPoint):
         return
 
     def deAssign_order(self):
@@ -89,13 +95,14 @@ class Order:
         return self.meetingPoint
 
 
-    def get_objective(self):  # Changed to add the 
+    def get_objective(self, collabGoal = None):  # Add optional argument 
         if self.state == 1:
             return self.pickupStation
         elif self.state == 2:
             return self.deliveryStation
         elif self.state == 3: 
             return self.meetingPoint
+        #elif self.state 
         else:
             print("exit() in order get_objective")
             exit()
