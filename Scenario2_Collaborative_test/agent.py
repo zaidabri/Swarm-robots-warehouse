@@ -9,6 +9,8 @@ class Agent_State(Enum):
     _Picking = 1
     _Delivering = 2
     _Meeting = 3 
+    _Waiting = 4 
+    _DeliveringCollab = 5 
 
 class Agent:
 
@@ -28,6 +30,8 @@ class Agent:
         self.goal = position
         self.Collaborating = True 
         self.collab_order = None 
+        self.Picker = False 
+        self.Deliverer = False 
 
         self.pathfinder = Pathfinder()
 
@@ -72,7 +76,13 @@ class Agent:
         elif newState == 3: # differentiate between agent ref and agent 2 
             self.state = Agent_State._Meeting
             self.goal = self.order.get_objective() #-- Add coordinate of meeting point, how ?? 
+        
+        elif newState == 4:  # stays where it is until the other robot has arrived 
+            self.state = Agent_State._Waiting
+            self.goal = self.position 
          
+        elif newState == 5: # delivering collaborative order 
+            print()
 
     def pick_order(self, timestep):
         self.order.set_order_state(2)
@@ -112,12 +122,13 @@ class Agent:
         #self.order.set_order_state(1)
         self.update_agent_state(2)
 
+    ''' ORDER ASSIGNATION SWITCHING TO BE IMPLEMENTED IN THE PAIR CLASS 
     def GoToMeetingPoint(self, order, timestep, ID): # function for second paired robot 
         self.order = order 
         self.meetingPoint= order.meetingPoint
         self.order.assign_order(self.agentId, timestep, self.position)
         self.update_agent_state(3)
-
+    '''
 
     def setNewOrder(self, order, timestep, ID):
         '''
@@ -137,7 +148,7 @@ class Agent:
             print("PICKING HERE",self.state, Agent_State._Picking)
             temp_dict = {"x": self.position[0], "y": self.position[1], "t": timestep}
             self.stepsHistory.append(temp_dict)# Save steps for visualization
-            self.pick_order(timestep)
+            self.pick_order(timestep) # it' s ittttt  TODO 
             return self.position
         elif self.state == Agent_State._Delivering and self.position == self.goal:# Delivers good
             print("DELIVERING HERE",self.state, Agent_State._Delivering)
@@ -145,13 +156,36 @@ class Agent:
             self.stepsHistory.append(temp_dict)# Save steps for visualization
             self.deliver_order(timestep)
             return self.position
+        
+        # Non collaborative actions   above 
 
-        elif self.state == Agent_State._Meeting and self.position == self.goal: # meet at meeting point in the middle 
-            print("MEETING HERE",self.state, Agent_State._Meeting )
+        # meet at meeting point in the middle AND COLLABORATIVE ORDER 
+        elif self.state == Agent_State._Meeting and self.position == self.goal and self.Collaborating and self.Picker: 
+            print("MEETING HERE Picker agent, waiting ",self.state, Agent_State._Meeting )
             temp_dict = {"x": self.position[0], "y": self.position[1], "t": timestep}
             self.stepsHistory.append(temp_dict)# Save steps for visualization
-            self.deliver_order(timestep)
+            self.update_agent_state(4)  # drops the package in the meeting point and waits for 
+
             return self.position  # CHANGED 
+
+        # waiting elif for deliverer 
+
+        elif self.state == Agent_State._Meeting and self.position == self.goal and self.Collaborating and self.Deliverer : # meet at meeting point in the middle AND COLLABORATIVE ORDER 
+            print("MEETING HERE Deliverer robot, waiting",self.state, Agent_State._Meeting )
+            temp_dict = {"x": self.position[0], "y": self.position[1], "t": timestep}
+            self.stepsHistory.append(temp_dict)# Save steps for visualization
+            self.update_agent_state(2)  # New state -- 5 delivery for collaboration  
+            return self.position  # CHANGED 
+
+        elif self.state == Agent_State._Meeting and self.position == self.goal and self.Collaborating and self.Picker :
+            print("MEETING HERE WITH PAIR ROBOT",self.state, Agent_State._Meeting, self.position )
+            temp_dict = {"x": self.position[0], "y": self.position[1], "t": timestep}
+            self.stepsHistory.append(temp_dict)# Save steps for visualization
+            self.update_agent_state(0)  # New state -- 5 delivery for collaboration  
+            return self.position  # CHANGE
+
+
+
 
 
         # Find next step
@@ -167,3 +201,21 @@ class Agent:
 
         print("End of MakesMove:", self.position)
         return self.position
+
+
+
+# TODO 
+
+'''
+1] Implement the new elif statements for the collaborative robots  in line 159 
+
+The statements needed are: 
+                        - Waiting for the deliverer at the meeting point 
+                        - Deliverer robot goes back to init position once it has reached its destination 
+                        - deliverer robot goes from _Meeting to _DeliveringCollab and becomes main robot of order assignation ( we need a new external function for that , function similar to the one at line 130)
+
+2] create the implementation of new state _DeliveringCollab -- line 84 
+
+Similarly to state 2 its goal is the delivery station but in addition it becomes the main robot of assignation when it comes to the order -- 
+
+'''

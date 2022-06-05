@@ -27,13 +27,19 @@ class DeliveryStation():
     def getCoordinate(self):
         return self.coordinate
 
-class Pair():
+class Pair():  # the purpose is to make sure that once on of the agents has reached the meeting point it waits until the other arrives for the next step. and order gets passed from one agent to the other 
     def __init__(self, agent1, agent2, order):
         self.agent1 = agent1
         self.agent2 = agent2 
         self.order = order 
     def getCoordinate(self): #TODO
         return self.agent1.getPosition(), self.agent2.getPosition()
+
+        '''
+        new function to implement: 
+        - it should check the coordinates of the agents and agents state, if both agents are _Waiting then the order assignment should be switched from agent1 to agent 2 
+        as now agent2 is responsible for deliverying it 
+        '''
 
 
 #changed
@@ -147,8 +153,8 @@ class WareHouse_Env():
                     if self.callForCollab(winner, order): 
                         agent2 = self.findThePair(winner)
                         if agent2 != False: 
-                            winner.Collaborating = True
-                            agent2.Collaborating = True
+                            winner.Collaborating = True; winner.Picker = True  # roles defined 
+                            agent2.Collaborating = True; agent2.Deliverer = True 
                             
                             winner.setOrder(order, timestep, winner.getId())
                             for i in range(len(self.order_list)):
