@@ -29,17 +29,18 @@ class DeliveryStation():
 
 class Pair():  # the purpose is to make sure that once on of the agents has reached the meeting point it waits until the other arrives for the next step. and order gets passed from one agent to the other 
     def __init__(self, agent1, agent2, order):
-        self.agent1 = agent1
-        self.agent2 = agent2 
+        self.agent1 = agent1  # picker 
+        self.agent2 = agent2 # deliverer 
         self.order = order 
     def getCoordinate(self): #TODO
         return self.agent1.getPosition(), self.agent2.getPosition()
 
-        '''
-        new function to implement: 
-        - it should check the coordinates of the agents and agents state, if both agents are _Waiting then the order assignment should be switched from agent1 to agent 2 
-        as now agent2 is responsible for deliverying it 
-        '''
+    def agents_met(self, timestep):
+        if self.agent1.getState() == Agent_State._Waiting and self.agent2.getState() == Agent_State._Waiting:
+            self.agent1.switch_order(timestep)
+            self.agent2.switch_order(timestep)
+
+
 
 
 #changed
@@ -155,6 +156,8 @@ class WareHouse_Env():
                         if agent2 != False: 
                             winner.Collaborating = True; winner.Picker = True  # roles defined 
                             agent2.Collaborating = True; agent2.Deliverer = True 
+
+                            # Create PAIR -- HOW ??? 
                             
                             winner.setOrder(order, timestep, winner.getId())
                             for i in range(len(self.order_list)):
@@ -188,6 +191,10 @@ class WareHouse_Env():
             self.map[agent.getPosition()[0], agent.getPosition()[1]] = 0  # Reset position of agent
             agent.makesMove(timestep, self.map)
             self.renderMap(timestep)
+        
+        # same thing as above but for the Pair class   
+        # TODO: create 3 pairs and do not initialize them -- follow same pattern as for order for assignment ( put the agents) and de assignment when order is delivered 
+
 
         # Print for console
         self.renderMap(timestep, False)
