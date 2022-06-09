@@ -7,7 +7,7 @@ import numpy
 import yaml
 import random
 
-from agent import Agent, Agent_State
+from agent import Agent, Agent_State, Pair, Pair_State
 from AGV import Order, Order_State  
 
 
@@ -26,20 +26,6 @@ class DeliveryStation():
 
     def getCoordinate(self):
         return self.coordinate
-
-class Pair():  # the purpose is to make sure that once on of the agents has reached the meeting point it waits until the other arrives for the next step. and order gets passed from one agent to the other 
-    def __init__(self, agent1, agent2, order):
-        self.agent1 = agent1  # picker 
-        self.agent2 = agent2 # deliverer 
-        self.order = order 
-    def getCoordinate(self): #TODO
-        return self.agent1.getPosition(), self.agent2.getPosition()
-
-    def agents_met(self, timestep):
-        if self.agent1.getState() == Agent_State._Waiting and self.agent2.getState() == Agent_State._Waiting:
-            self.agent1.switch_order(timestep)
-            self.agent2.switch_order(timestep)
-
 
 
 

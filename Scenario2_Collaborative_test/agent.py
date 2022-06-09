@@ -290,3 +290,44 @@ when both robots state == waiting then deliverer becomes main assignatory of ord
                                                                                                                         - Deliverer.state = _DeliveringCollab -- goes to delivery station DONE
                                                                                                                         - Picker.state = done -- goes back to init pos. DONE
 '''
+
+class Pair_State(Enum):
+    _Available = 0
+    _Busy = 1
+
+class Pair():  # the purpose is to make sure that once on of the agents has reached the meeting point it waits until the other arrives for the next step. and order gets passed from one agent to the other 
+
+    def __init__(self):
+        self.agent1 = None  # picker 
+        self.agent2 = None # deliverer 
+        self.order = None 
+        self.state = Pair_State._Available
+
+    def getCoordinate(self): #TODO
+        return self.agent1.getPosition(), self.agent2.getPosition()
+
+    def agents_met(self, timestep):
+        if self.agent1.getState() == Agent_State._Waiting and self.agent2.getState() == Agent_State._Waiting:
+            self.agent1.switch_order(timestep)
+            self.agent2.switch_order(timestep)
+            self.update_pair_state(0)
+
+    def assign_agents(self, agent1, agent2, order):
+        if self.state == Pair_State._Available:
+            self.agent1 = agent1 
+            self.agent2 = agent2 
+            self.order = order 
+            self.update_pair_state(1)
+
+    def free_pair(self):
+        self.agent1 = None 
+        self.agent2 = None
+        self.order = None
+
+    def update_pair_state(self, NewState): 
+        if NewState == 0: 
+            self.free_pair()
+            self.state = Pair_State._Available
+        elif NewState == 1: 
+            self.state = Pair_State._Busy
+
