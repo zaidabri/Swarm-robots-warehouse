@@ -94,6 +94,12 @@ class WareHouse_Env():
             idAg = agent.getId()
             self.agentsInitPos.append([idAg, startX, startY])  # storing the init position of each agent 
 
+        # create pairs 
+        m = int(len(self.agents)/2)
+
+        self.pairs = []
+        for i in range(m): 
+            self.pairs.append(Pair(i))
 
         # Create Orders
         self.order_list = []

@@ -297,7 +297,8 @@ class Pair_State(Enum):
 
 class Pair():  # the purpose is to make sure that once on of the agents has reached the meeting point it waits until the other arrives for the next step. and order gets passed from one agent to the other 
 
-    def __init__(self):
+    def __init__(self, Id):
+        self.Id = Id 
         self.agent1 = None  # picker 
         self.agent2 = None # deliverer 
         self.order = None 
@@ -319,6 +320,12 @@ class Pair():  # the purpose is to make sure that once on of the agents has reac
             self.order = order 
             self.update_pair_state(1)
 
+    def getId(self):
+        return self.Id
+
+    def getState(self):
+        return self.state
+        
     def free_pair(self):
         self.agent1 = None 
         self.agent2 = None
