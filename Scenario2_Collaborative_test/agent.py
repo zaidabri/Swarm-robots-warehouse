@@ -303,17 +303,20 @@ class Pair():  # the purpose is to make sure that once on of the agents has reac
         self.agent2 = None # deliverer 
         self.order = None 
         self.state = Pair_State._Available
+        self.pairLog = []  # history of the pair for analizing it later. 
 
     def getCoordinate(self): #TODO
         return self.agent1.getPosition(), self.agent2.getPosition()
 
     def agents_met(self, timestep):
-        if self.agent1.getState() == Agent_State._Waiting and self.agent2.getState() == Agent_State._Waiting:
-            self.agent1.switch_order(timestep)
-            self.agent2.switch_order(timestep)
-            self.update_pair_state(0)
 
-    def assign_agents(self, agent1, agent2, order):
+        if self.agent1 != None and self.agent2 != None:
+            if self.agent1.getState() == Agent_State._Waiting and self.agent2.getState() == Agent_State._Waiting:
+                self.agent1.switch_order(timestep)
+                self.agent2.switch_order(timestep)
+                self.update_pair_state(0)
+
+    def assign_agents(self, agent1, agent2, order, timestep):
         if self.state == Pair_State._Available:
             self.agent1 = agent1 
             self.agent2 = agent2 
@@ -325,7 +328,7 @@ class Pair():  # the purpose is to make sure that once on of the agents has reac
 
     def getState(self):
         return self.state
-        
+
     def free_pair(self):
         self.agent1 = None 
         self.agent2 = None
@@ -337,4 +340,8 @@ class Pair():  # the purpose is to make sure that once on of the agents has reac
             self.state = Pair_State._Available
         elif NewState == 1: 
             self.state = Pair_State._Busy
+
+
+    def MakesMove(self, timestep):  # function which is called in loop -- need to be sum all functionalities in here 
+        self.agents_met(timestep)
 

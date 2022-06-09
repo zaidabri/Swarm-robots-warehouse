@@ -134,22 +134,24 @@ class WareHouse_Env():
             if order.get_order_state() == 0 and order.getTimestep_begin() <= timestep:
                 winner = None
                 winnerDistance = None
-                for agent in self.agents:
+                for agent in self.agents: # shuffle the agents so that it's more random TODO 
                     if agent.getState() == Agent_State._Done:  # Agent is _Done
                         #distance = self.callForProposal(agent, order)
                         if winner == None: #or distance < winnerDistance:
                             #winnerDistance = distance
                             winner = agent
                            
-                if winner != None:
+                if winner != None:   # reorganize the structure so that it works also when there is no collaborartion either for the order or either for the non availability.
                     # check if order should be collaborative 
                     if self.callForCollab(winner, order): 
                         agent2 = self.findThePair(winner)
                         if agent2 != False: 
                             winner.Collaborating = True; winner.Picker = True  # roles defined 
                             agent2.Collaborating = True; agent2.Deliverer = True 
-
-                            # Create PAIR -- HOW ??? 
+                            for pair in self.pairs:
+                                if pair.getState == Pair_State._Available:
+                                    pair.assign_agents(winner, agent2, order, timestep) # pair creation 
+                            
                             
                             winner.setOrder(order, timestep, winner.getId())
                             for i in range(len(self.order_list)):
@@ -183,6 +185,10 @@ class WareHouse_Env():
             self.map[agent.getPosition()[0], agent.getPosition()[1]] = 0  # Reset position of agent
             agent.makesMove(timestep, self.map)
             self.renderMap(timestep)
+
+
+        for pair in self.pairs:
+            pair.MakesMove(timestep)
         
         # same thing as above but for the Pair class   
         # TODO: create 3 pairs and do not initialize them -- follow same pattern as for order for assignment ( put the agents) and de assignment when order is delivered 
