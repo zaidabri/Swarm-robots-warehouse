@@ -143,7 +143,7 @@ class WareHouse_Env():
                            
                 if winner != None:   # reorganize the structure so that it works also when there is no collaborartion either for the order or either for the non availability.
                     # check if order should be collaborative 
-                    if self.callForCollab(winner, order): 
+                    if self.callForCollab(winner, order) == True : 
                         agent2 = self.findThePair(winner)
                         if agent2 != False: 
                             winner.Collaborating = True; winner.Picker = True  # roles defined 
@@ -157,6 +157,21 @@ class WareHouse_Env():
                             for i in range(len(self.order_list)):
                                 if order.getOrderId() == self.order_list[i].id_code:
                                     self.order_list[i].agent_assigned = winner.getId()
+
+                        elif agent2 == False:
+                            winner.setOrder(order, timestep, winner.getId())
+                            for i in range(len(self.order_list)):
+                                if order.getOrderId() == self.order_list[i].id_code:
+                                    self.order_list[i].agent_assigned = winner.getId() 
+
+                    elif self.callForCollab(winner, order) == False: 
+                        winner.setOrder(order, timestep, winner.getId())
+                        for i in range(len(self.order_list)):
+                            if order.getOrderId() == self.order_list[i].id_code:
+                                self.order_list[i].agent_assigned = winner.getId() 
+
+                    
+
 
         '''
             eCNP: All agents get orders proposed, also agent who already working on an order.
