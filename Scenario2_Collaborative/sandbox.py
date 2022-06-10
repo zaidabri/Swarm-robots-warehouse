@@ -1,3 +1,7 @@
+from agent import Pair, Pair_State, Agent, Agent_State
+from AGV import Order, Order_State
+
+
 '''
 FILE USED FOR PROTOTYPING AND DEBUGGING SINGLE FUNCTIONS OF THE CODE 
 '''
@@ -20,7 +24,7 @@ print(InitPos[0][2])
 
 '''
 # GOAL: TODO create a list of lists and access them 
-
+'''
 from agent import Pair, Pair_State
 agents = 7 
 
@@ -43,3 +47,7 @@ else:
 
 for pair in pairs:
     print("this is pair ", pair , "and its Id is ",pair.getId())
+'''
+
+
+

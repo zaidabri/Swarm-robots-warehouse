@@ -118,12 +118,37 @@ class WareHouse_Env():
                   order.timestep_begin)
             
             self.order_list.append(order)
-            print("Initialization pt 2")
+            #print("Initialization pt 2")
             # self.order_stats.append(order)
 
+        #print("------------------------------------------------------------------------------------------")
+        #print("length of order list", len(self.order_list))
+        #print("first element of the list", self.order_list[0])
+        #print("list type ", type(self.order_list[0]))
         # Check if all agents are done
         self._done = False
+        #print("------------------------------------------------------------------------------------------")
+        
+        #print("agents: type", type(self.agents[0]))
+        #print(self.agents)
+        #print("orders : type", type(self.order_list[0]))
+        #print(self.order_list)
+        #print("------------------------------------------------------------------------------------------")
 
+        random.shuffle(self.order_list)
+        random.shuffle(self.agents)
+        #print("------------------------------------------------------------------------------------------")
+
+        '''
+        print("Entering")
+        print("agents reshuffled : type ", type(self.agents[0]))
+        print(self.agents)
+        print("orders reshuffled : type ", type(self.order_list[0]))
+        print(self.order_list)
+        print("Exiting")
+        print("------------------------------------------------------------------------------------------")
+
+        '''
         # Render in Terminal option
         self.renderMap(0)
 
@@ -133,7 +158,6 @@ class WareHouse_Env():
         '''
             CNP: Orders are distributed here. Agent bid with distance to pickup station of order.
         '''
-        self.order_list = random.shuffle(self.order_list)
         for order in self.order_list:
             if order.get_order_state() == 0 and order.getTimestep_begin() <= timestep:
                 winner = None
@@ -251,7 +275,7 @@ class WareHouse_Env():
         value = 0 
         for agentPos in self.agentsInitPos:  # check initial positions 
             value = 0
-            value = agentRef.getPosition()[1] - agentPos[2]  # check this TODO
+            value = agentRef.getPosition()[1] - agentPos[2]  # check this TODO --- is it doing the calculation ? 
             differences.append(value)
             ids.append(agentPos[0])
             
@@ -275,7 +299,7 @@ class WareHouse_Env():
                     elif is_not_busy(candidate) == False:
                         differences.remove(minDiff)
                         ids.remove(ids[minDiffIndex])
-                elif differences != True and ids != True: # if all agents are busy then it is impossible to pair 
+                elif differences == [] and ids == []: # if all agents are busy then it is impossible to pair 
                         print("All agents busy, sorry")
         return False
         
