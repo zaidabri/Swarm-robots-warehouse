@@ -113,9 +113,12 @@ class WareHouse_Env():
             Delivery = params["order"]["orders_"][i]["deliveryStation"]  # added line 
             MeetingPoints = params["order"]["orders_"][i]["meetingPoint"]  # added line 
             order = Order(Delivery[0], PickUP[0], MeetingPoints[0], quantity, timestep_begin, id_code) # check --- #CHANGED
-            print("ORDER", order.id_code, order.pickupStation, order.deliveryStation, "quantity:", order.requested_quantities, "time_begin:",
+            print("Initialization pt 1")
+            print("ORDER", order.id_code, order.pickupStation, order.deliveryStation, order.meetingPoint,"quantity:", order.requested_quantities, "time_begin:",
                   order.timestep_begin)
+            
             self.order_list.append(order)
+            print("Initialization pt 2")
             # self.order_stats.append(order)
 
         # Check if all agents are done
@@ -130,6 +133,7 @@ class WareHouse_Env():
         '''
             CNP: Orders are distributed here. Agent bid with distance to pickup station of order.
         '''
+        self.order_list = random.shuffle(self.order_list)
         for order in self.order_list:
             if order.get_order_state() == 0 and order.getTimestep_begin() <= timestep:
                 winner = None
@@ -146,13 +150,13 @@ class WareHouse_Env():
                     if self.callForCollab(winner, order) == True : 
                         agent2 = self.findThePair(winner)
                         if agent2 != False: 
-                            winner.Collaborating = True; winner.Picker = True  # roles defined 
-                            agent2.Collaborating = True; agent2.Deliverer = True 
                             for pair in self.pairs:
                                 if pair.getState == Pair_State._Available:
-                                    pair.assign_agents(winner, agent2, order, timestep) # pair creation 
-                            
-                            
+                                    pair.assign_agents(winner, agent2, order, timestep)# pair creation 
+
+                            winner.setCollab_state(1, order) # setting collaboration within robots 
+                            agent2.setCollab_state(0, order)
+
                             winner.setOrder(order, timestep, winner.getId())
                             for i in range(len(self.order_list)):
                                 if order.getOrderId() == self.order_list[i].id_code:

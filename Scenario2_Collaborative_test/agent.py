@@ -28,7 +28,7 @@ class Agent:
         self.order_log = []
         self.order = None
         self.goal = position
-        self.Collaborating = True 
+        self.Collaborating = False
         self.collab_order = None 
         self.Picker = False 
         self.Deliverer = False 
@@ -38,6 +38,24 @@ class Agent:
 
         # temp_dict = {"x": self.position[0], "y": self.position[1], "t": 0}
         # self.stepsHistory.append(temp_dict)
+
+    def resetCollab(self):
+        self.Collaborating= False
+        self.collab_order = None 
+        self.Picker = False 
+        self.Deliverer = False 
+
+    def setCollab_state(self, ctrl, order): # ADDED 
+        self.Collaborating = True 
+        if ctrl == 1: 
+            self.Picker = True 
+            self.collab_order = None 
+            self.Deliverer = False 
+        elif ctrl == 0: 
+            self.Deliverer = True 
+            self.Picker = False 
+            self.collab_order(order)
+
 
     def getPosition(self):
         return self.position
@@ -222,6 +240,7 @@ class Agent:
             self.stepsHistory.append(temp_dict)# Save steps for visualization
             self.Met = False # reset as order is delivered 
             self.deliver_order(timestep)  # action to deliver order 
+            self.resetCollab()
             return self.position  # CHANGED 
 
         elif self.state == Agent_State._Picking and self.position == self.goal and self.Collaborating and self.Picker:
@@ -246,6 +265,7 @@ class Agent:
             temp_dict = {"x": self.position[0], "y": self.position[1], "t": timestep}
             self.stepsHistory.append(temp_dict)# Save steps for visualization
             self.Met = False # reset it for the next collaborative iteration
+            self.resetCollab()
             self.update_agent_state(0)  # New state -- 5 delivery for collaboration  
             return self.position  # CHANGE
 
