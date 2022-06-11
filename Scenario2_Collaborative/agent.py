@@ -54,7 +54,7 @@ class Agent:
         elif ctrl == 0: 
             self.Deliverer = True 
             self.Picker = False 
-            self.collab_order(order)
+            self.setCollabOrder(order)
 
 
     def getPosition(self):
