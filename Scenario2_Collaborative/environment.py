@@ -298,10 +298,10 @@ class WareHouse_Env():
         minDiffIndex = 0
 
         while differences != empty: 
+
             for agent in self.agents:
                 minDiff = min(differences)  
                 print("**************************************************")
-
                 print(minDiff, "difference min ") 
                 minDiffIndex = differences.index(minDiff)
 
@@ -315,6 +315,7 @@ class WareHouse_Env():
                         ids.remove(ids[minDiffIndex])
                 elif differences == [] and ids == []: # if all agents are busy then it is impossible to pair 
                         print("All agents busy, sorry")
+
         return False
         
         
@@ -461,7 +462,7 @@ if __name__ == "__main__":
 
         timestep += 1
 
-        if timestep > 100 or env.allOrdersDone():  # debugging 
+        if timestep > 250 or env.allOrdersDone():  # debugging 
             print("Done with", timestep, "timesteps.")
             break
 
