@@ -462,7 +462,7 @@ if __name__ == "__main__":
 
         timestep += 1
 
-        if timestep > 250 or env.allOrdersDone():  # debugging 
+        if timestep > 500 or env.allOrdersDone():  # debugging 
             print("Done with", timestep, "timesteps.")
             break
 

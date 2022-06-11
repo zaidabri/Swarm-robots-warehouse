@@ -12,3 +12,17 @@ max simulation time
 121
 average order changes 
 0
+
+
+average min distance 
+40.3
+average performed distance 
+46
+average loss 
+5.69
+max loss 
+5.69
+max simulation time 
+101
+average order changes 
+0

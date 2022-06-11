@@ -153,7 +153,7 @@ class Agent:
         self.collab_order = order
         self.meetingPoint = order.meetingPoint
         self.update_agent_state(3)
-        self.goal = order.meetingPoint()
+        self.goal = order.getMeetingPoint()  # function in order to retrieve meeting point ?
 
     '''   *** FUNCTION NEEDS TO BE SPLIT -- ONE FUNCTION FOR DELIVERING AND ONE FUNCTION FOR ASSIGNING THE ORDER DEPENDENT OF THE PAIR CLASS 
 
