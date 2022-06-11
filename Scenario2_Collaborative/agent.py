@@ -191,6 +191,10 @@ class Agent:
         self.setOrder(order, timestep, ID)
 
     def makesMove(self, timestep, map):   # function which does the magicccc 
+        print("----------------------------***************")
+        print("agent Id", self.agentId)
+        print("state of the agent", self.state)
+        print("----------------------------***************")
 
         if self.state == Agent_State._Done and self.position == self.goal:
             print("DONE HERE",self.state, Agent_State._Done)

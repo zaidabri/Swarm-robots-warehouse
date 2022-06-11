@@ -172,10 +172,15 @@ class WareHouse_Env():
                 if winner != None:   # reorganize the structure so that it works also when there is no collaborartion either for the order or either for the non availability.
                     # check if order should be collaborative 
                     if self.callForCollab(winner, order) == True : 
+                        print("entered")
                         agent2 = self.findThePair(winner)
                         if agent2 != False: 
+                            print("entered 2")
+                            print("winner of order assign", winner, "second agent", agent2)
                             for pair in self.pairs:
+                                print("entered 3")
                                 if pair.getState == Pair_State._Available:
+                                    print("entered 4")
                                     pair.assign_agents(winner, agent2, order, timestep)# pair creation 
 
                             winner.setCollab_state(1, order) # setting collaboration within robots 
@@ -187,12 +192,14 @@ class WareHouse_Env():
                                     self.order_list[i].agent_assigned = winner.getId()
 
                         elif agent2 == False:
+                            print("entered 1")
                             winner.setOrder(order, timestep, winner.getId())
                             for i in range(len(self.order_list)):
                                 if order.getOrderId() == self.order_list[i].id_code:
                                     self.order_list[i].agent_assigned = winner.getId() 
 
                     elif self.callForCollab(winner, order) == False: 
+                        print("entered 5")
                         winner.setOrder(order, timestep, winner.getId())
                         for i in range(len(self.order_list)):
                             if order.getOrderId() == self.order_list[i].id_code:
@@ -264,8 +271,8 @@ class WareHouse_Env():
 
     def findThePair(self, agentRef):  # agentRef is the agent to which the order has been assigned 
         
-        def is_not_busy(agent):
-            if agent.getState() == 0:
+        def is_not_busy(agent):  # 
+            if agent.getState() == Agent_State._Done:
                 return True
             else:
                 return False
@@ -273,12 +280,16 @@ class WareHouse_Env():
         differences = []
         ids = []
         value = 0 
+        # TODO --   CALCULATES ALL DIFFERENCES EXCEPT THE ONE WITH ONESELF
         for agentPos in self.agentsInitPos:  # check initial positions 
             value = 0
             value = agentRef.getPosition()[1] - agentPos[2]  # check this TODO --- is it doing the calculation ? 
             differences.append(value)
             ids.append(agentPos[0])
-            
+
+        print(differences, "differences values full list") 
+        print("**************************************************")
+        print(ids, "ids corresponding to the min differences ")  # is the order correct ? 
         #TODO -- finish to implement the pair matching 
         # find min difference -- check if agent is not busy, if not then return the found agent, if 
         # agent is busy find the other one which is closest and on the other side and so on, make it in a for loop which scans it 
@@ -288,7 +299,10 @@ class WareHouse_Env():
 
         while differences != empty: 
             for agent in self.agents:
-                minDiff = min(differences)   
+                minDiff = min(differences)  
+                print("**************************************************")
+
+                print(minDiff, "difference min ") 
                 minDiffIndex = differences.index(minDiff)
 
                 if ids[minDiffIndex] == agent.getId() and ids and differences:
@@ -447,7 +461,7 @@ if __name__ == "__main__":
 
         timestep += 1
 
-        if timestep > 20000000 or env.allOrdersDone():
+        if timestep > 100 or env.allOrdersDone():  # debugging 
             print("Done with", timestep, "timesteps.")
             break
 
