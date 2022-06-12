@@ -58,9 +58,6 @@ class Order:
             self.assign_order(self, agent1ID, timestep, agent1_pos)
 
 
-    def collaborative_order(self, agentId, agent2Id, timestep, agent_pos, meetingPoint):
-        return
-
     def deAssign_order(self):
         
         '''

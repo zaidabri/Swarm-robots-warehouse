@@ -101,6 +101,8 @@ class WareHouse_Env():
         for i in range(m): 
             self.pairs.append(Pair(i))
 
+        print(self.pairs)
+
         # Create Orders
         self.order_list = []
         # self.order_stats = []
@@ -176,23 +178,36 @@ class WareHouse_Env():
                         agent2 = self.findThePair(winner)
                         if agent2 != False: 
                             print("entered 2")
-                            print("winner of order assign", winner, "second agent", agent2)
+                            print("winner of order assign", winner.getId(), "second agent", agent2.getId())
                             for pair in self.pairs:
                                 print("entered 3")
-                                if pair.getState == Pair_State._Available:
+                                print(pair.getState())
+                                if pair.getState() == Pair_State._Available:  # enters 3 times, while it should enter only 1 
                                     print("entered 4")
                                     pair.assign_agents(winner, agent2, order, timestep)# pair creation 
-
-                            winner.setCollab_state(1, order) # setting collaboration within robots 
-                            agent2.setCollab_state(0, order)
-
+                                    #print("")
+                                    break
+                            
+                            
+                            winner.resetCollab()
+                            agent2.resetCollab()
                             winner.setOrder(order, timestep, winner.getId())
                             for i in range(len(self.order_list)):
                                 if order.getOrderId() == self.order_list[i].id_code:
                                     self.order_list[i].agent_assigned = winner.getId()
+                            
+                            print("setting order up")
+                            
+                            winner.setCollab_state(1, order) # setting collaboration within robots 
+                            print("order set up for agent 1 ", winner.getState())
+                        
+                            agent2.setCollab_state(0, order)
+                            print("order set up for agent 2 ", agent2.getState())
+
 
                         elif agent2 == False:
                             print("entered 1")
+                            winner.resetCollab()
                             winner.setOrder(order, timestep, winner.getId())
                             for i in range(len(self.order_list)):
                                 if order.getOrderId() == self.order_list[i].id_code:
@@ -200,6 +215,9 @@ class WareHouse_Env():
 
                     elif self.callForCollab(winner, order) == False: 
                         print("entered 5")
+                        print(winner.getId(), order)
+                        print('-------------------------------')
+                        winner.resetCollab()
                         winner.setOrder(order, timestep, winner.getId())
                         for i in range(len(self.order_list)):
                             if order.getOrderId() == self.order_list[i].id_code:
@@ -284,8 +302,9 @@ class WareHouse_Env():
         for agentPos in self.agentsInitPos:  # check initial positions 
             value = 0
             value = agentRef.getPosition()[1] - agentPos[2]  # check this TODO --- is it doing the calculation ? 
-            differences.append(value)
-            ids.append(agentPos[0])
+            if abs(value) != 0 and agentRef.getId() != agentPos[0]:
+                differences.append(abs(value))
+                ids.append(agentPos[0])
 
         print(differences, "differences values full list") 
         print("**************************************************")
@@ -308,7 +327,7 @@ class WareHouse_Env():
                 if ids[minDiffIndex] == agent.getId() and ids and differences:
                     candidate = agent
                     if is_not_busy(candidate):
-                        print("Pair found!", candidate.getId())
+                        print("Pair found! for ",agentRef.getId(),"paired with :", candidate.getId())
                         return candidate 
                     elif is_not_busy(candidate) == False:
                         differences.remove(minDiff)
@@ -457,11 +476,15 @@ if __name__ == "__main__":
     input_file ="input.yaml" #sys.argv[1]
     env = WareHouse_Env(input_config_file=input_file)
     timestep = 0
+
+    agentState =[]
+    pairsState = []
+
     while True:
         env.step(timestep)
 
         timestep += 1
-
+        
         if timestep > 500 or env.allOrdersDone():  # debugging 
             print("Done with", timestep, "timesteps.")
             break
@@ -509,14 +532,24 @@ if __name__ == "__main__":
         simulationtimelist.append(E.timestep_end)
 
     orderchangelist = []
+   
     for agent in env.agents:
         i = 0
         for first, second in zip(agent.order_log, agent.order_log[1 : ] + agent.order_log[ : 1]):
             if (first != second):
                 i = i + 1
 
+        
         print("agent:", agent.agentId, ", number of order-changes:", agent.order_switchcount, ', unequal changes: ', i)
         orderchangelist.append(i)
+
+    for agent in env.agents:
+            agentState.append([agent.state, agent.agentId, "\n"])
+
+    for pair in env.pairs:
+        if pair.agent1 != None:
+            pairsState.append([pair.agent1.getId(), "Picker",pair.agent1.Picker ,pair.agent1.getState(), pair.agent2.getId(), "Deliverer",pair.agent2.Deliverer, pair.agent2.getState(), "\n"])
+
 
     print('average order switches ' + str(mean(orderchangelist)))
     write_output_file("./output.yaml", env.output)
@@ -529,6 +562,18 @@ if __name__ == "__main__":
     filehandler0.write(str(mean(orderchangelist)))
     filehandler0.write("\n")
     filehandler0.close()
+
+    filehandlerA = open('agentStates.txt', 'a')
+    filehandlerA.write(str(agentState))
+    filehandlerA.write("\n")
+    filehandlerA.close()
+
+    filehandlerP = open('PairsStates.txt', 'a')
+    filehandlerP.write(str(pairsState))
+    filehandlerP.write("\n")
+    filehandlerP.close()
+
+    
 
     filehandler2 = open('maxdeliverytimeagents.txt', 'a')
     filehandler2.write(str(max(maxdeliverylist)))

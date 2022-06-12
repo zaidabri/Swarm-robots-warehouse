@@ -45,16 +45,20 @@ class Agent:
         self.Picker = False 
         self.Deliverer = False 
 
-    def setCollab_state(self, ctrl, order): # ADDED 
+    def setCollab_state(self, ctrl, order): # ADDED   ---
         self.Collaborating = True 
         if ctrl == 1: 
+            print("picker agent", self.agentId)
             self.Picker = True 
             self.collab_order = None 
             self.Deliverer = False 
         elif ctrl == 0: 
+            print("Deliverer agent", self.agentId)
+
             self.Deliverer = True 
             self.Picker = False 
-            self.setCollabOrder(order)
+            self.setCollabOrder(order)  # state of agent not changed 
+            print("Deliverer state ",self.state)
 
 
     def getPosition(self):
@@ -76,7 +80,8 @@ class Agent:
 
     # Check agent state by checking the order state TODO normally check state the other way agent --> order
     def update_agent_state(self, newState):
-        if self.order == None:
+        print(newState, "new state into update agent state function")
+        if self.order == None and self.Deliverer == False and self.Picker == False:  # this oooneeeee 
             return
         elif newState == 0:# "_Done"
             self.state = Agent_State._Done
@@ -93,14 +98,22 @@ class Agent:
             self.goal = self.order.get_objective()
             #print("self.deliveryStation.coordinate34", self.goal)
         
-        elif newState == 3 and self.Deliverer: # differentiate between agent ref and agent 2 
+        elif newState == 3 and self.Deliverer == True: # differentiate between agent ref and agent 2 
+            print("new state for deliverer agent")
             self.state = Agent_State._Meeting
-            self.goal = self.order.get_objective() #-- Add coordinate of meeting point, how ?? 
+            print(self.state)
+            print(self.collab_order)
+            self.goal = self.collab_order.get_objective() #-- Add coordinate of meeting point, how ??    # change it 
         
-        elif newState == 3 and self.Picker:
+        elif newState == 3 and self.Picker == True:
+            print("new state for picker agent ")
             self.state = Agent_State._Meeting
             goal = self.order.get_objective()
+            print("new goal",goal)
+            goal = list(goal)
             goal[0] = goal[0]-1 # ** this is needed otherwise the two robots would have the same coordinates as goal and therefore would never meet 
+            goal = tuple(goal)
+            print("new goal manipulated", goal)
             self.goal = goal
 
         elif newState == 4:  # stays where it is until the other robot has arrived 
@@ -150,9 +163,13 @@ class Agent:
 
 
     def setCollabOrder(self, order): 
+        print("collab order function entered ")
         self.collab_order = order
         self.meetingPoint = order.meetingPoint
+        print(self.Picker, "self.picker")
+        print(self.Deliverer, "self.deliverer" )
         self.update_agent_state(3)
+        print("agent state to be updated ")
         self.goal = order.getMeetingPoint()  # function in order to retrieve meeting point ?
 
     '''   *** FUNCTION NEEDS TO BE SPLIT -- ONE FUNCTION FOR DELIVERING AND ONE FUNCTION FOR ASSIGNING THE ORDER DEPENDENT OF THE PAIR CLASS 
@@ -194,6 +211,9 @@ class Agent:
         print("----------------------------***************")
         print("agent Id", self.agentId)
         print("state of the agent", self.state)
+        print("Picker", self.Picker)
+        print("Deliverer", self.Deliverer)
+        print("order", self.order)
         print("----------------------------***************")
 
         if self.state == Agent_State._Done and self.position == self.goal:
@@ -201,7 +221,7 @@ class Agent:
             temp_dict = {"x": self.position[0], "y": self.position[1], "t": timestep}
             self.stepsHistory.append(temp_dict)# Save steps for visualization
             return self.position
-        elif self.state == Agent_State._Picking and self.position == self.goal:# Picks up good for order
+        elif self.state == Agent_State._Picking and self.position == self.goal and self.Picker == False:# Picks up good for order
             print("PICKING HERE",self.state, Agent_State._Picking)
             temp_dict = {"x": self.position[0], "y": self.position[1], "t": timestep}
             self.stepsHistory.append(temp_dict)# Save steps for visualization
@@ -218,6 +238,7 @@ class Agent:
 
         # meet at meeting point in the middle AND COLLABORATIVE ORDER 
         # Picker robot waits for the deliverer 
+
         elif self.state == Agent_State._Meeting and self.position == self.goal and self.Collaborating and self.Picker and self.Met == False : 
             print("MEETING HERE Picker agent, waiting ",self.state, Agent_State._Meeting )
             temp_dict = {"x": self.position[0], "y": self.position[1], "t": timestep}
@@ -225,6 +246,8 @@ class Agent:
             self.update_agent_state(4)  # drops the package in the meeting point and waits for 
 
             return self.position  # CHANGED 
+
+        
 
         # waiting elif for deliverer 
         elif self.state == Agent_State._Meeting and self.position == self.goal and self.Collaborating and self.Deliverer and self.Met == False: 
@@ -244,11 +267,11 @@ class Agent:
             self.stepsHistory.append(temp_dict)# Save steps for visualization
             self.Met = False # reset as order is delivered 
             self.deliver_order(timestep)  # action to deliver order 
-            self.resetCollab()
+            #self.resetCollab()
             return self.position  # CHANGED 
 
         elif self.state == Agent_State._Picking and self.position == self.goal and self.Collaborating and self.Picker:
-            print("PICKING HERE",self.state, Agent_State._Picking)
+            print("PICKING HERE COLLAB",self.state, Agent_State._Picking)
             temp_dict = {"x": self.position[0], "y": self.position[1], "t": timestep}
             self.stepsHistory.append(temp_dict)# Save steps for visualization
             self.pick_order_collab(timestep) # it' s ittttt  TODO 
@@ -264,12 +287,12 @@ class Agent:
             return self.position  # CHANGED 
 
             # come back to base 
-        elif self.state == Agent_State._Meeting and self.position == self.goal and self.Collaborating and self.Picker and self.Met == True:
+        elif self.state == Agent_State._Waiting and self.position == self.goal and self.Collaborating and self.Picker and self.Met == True:
             print("MET HERE WITH PAIR ROBOT DONE, COMING BACK TO INIT POS",self.state, Agent_State._Meeting, self.position )
             temp_dict = {"x": self.position[0], "y": self.position[1], "t": timestep}
             self.stepsHistory.append(temp_dict)# Save steps for visualization
             self.Met = False # reset it for the next collaborative iteration
-            self.resetCollab()
+            #self.resetCollab()
             self.update_agent_state(0)  # New state -- 5 delivery for collaboration  
             return self.position  # CHANGE
 
@@ -278,7 +301,7 @@ class Agent:
 
 
         # Find next step
-        print("self.goal)", self.goal)
+        #print("self.goal)", self.goal)
         x, y = self.pathfinder.solve(self.agentId ,map.copy(), self.position, self.goal)
 
         self.position = (x, y)
@@ -288,7 +311,7 @@ class Agent:
         temp_dict = {"x": self.position[0], "y": self.position[1], "t": timestep}
         self.stepsHistory.append(temp_dict)
 
-        print("End of MakesMove:", self.position)
+        #print("End of MakesMove:", self.position)
         return self.position
 
 
@@ -341,10 +364,15 @@ class Pair():  # the purpose is to make sure that once on of the agents has reac
                 self.update_pair_state(0)
 
     def assign_agents(self, agent1, agent2, order, timestep):
+        print("pair assignment called")
         if self.state == Pair_State._Available:
             self.agent1 = agent1 
+            print(self.agent1.getId())
             self.agent2 = agent2 
+            print(self.agent2.getId())
+
             self.order = order 
+            print(self.order.getOrderId())
             self.update_pair_state(1)
 
     def getId(self):

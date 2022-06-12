@@ -30,7 +30,7 @@ class Pathfinder:
             if isinstance(graph[x][y+1], str) and "A" in graph[x][y+1]:
                 graph[x][y+1] = 0
 
-        print(graph)
+        #print(graph)     # TODO
         #Change not neighbour agents to 1 because they are not obstacles
         for i in range(len(graph)):
             for j in range(len(graph[i])):
@@ -46,7 +46,9 @@ class Pathfinder:
 
 
         return graph
-
+    
+    # comment it out ? 
+    
     def randomStep(self, graph, start):
         print("RANDOMSTEP INPUT", start)
         for i in range(4):
@@ -72,12 +74,12 @@ class Pathfinder:
                 if y >= 0 and graph[x][y] == 1:
                     return x,y
         return start[0], start[1]
-
+    
 
     def solve(self, agentId, graph, start, end):
-        print("main\\","agentId:",agentId, "start:", start,"end:", end)
+        #print("main\\","agentId:",agentId, "start:", start,"end:", end)
 
-        print(graph)
+        #print(graph)
 
 
         self.x = start[0]
@@ -85,7 +87,7 @@ class Pathfinder:
         preparedGraph = self.prepareGraph(graph, start)
         preparedGraph = graph.astype(dtype=np.int8, order="F")
 
-        print(preparedGraph)
+        #print(preparedGraph)
         tcodGraph = tcod.path.SimpleGraph(cost=preparedGraph,cardinal=1,diagonal=0)
 
         pf = tcod.path.Pathfinder(tcodGraph)
@@ -100,5 +102,5 @@ class Pathfinder:
             return self.x, self.y
         else:
             x, y = self.randomStep(preparedGraph, start)
-            print("x and y", x, y)
+            #print("x and y", x, y)
             return x, y
