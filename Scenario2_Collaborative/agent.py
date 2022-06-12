@@ -213,7 +213,11 @@ class Agent:
         print("state of the agent", self.state)
         print("Picker", self.Picker)
         print("Deliverer", self.Deliverer)
-        print("order", self.order)
+        
+        if self.order != None:
+            print("order", self.order.getOrderId())
+        
+        print("Agents Met ?", self.Met)
         print("----------------------------***************")
 
         if self.state == Agent_State._Done and self.position == self.goal:
@@ -265,7 +269,7 @@ class Agent:
             print("ORDER DELIVERED BY Deliverer agent ",self.state, Agent_State._Meeting )
             temp_dict = {"x": self.position[0], "y": self.position[1], "t": timestep}
             self.stepsHistory.append(temp_dict)# Save steps for visualization
-            self.Met = False # reset as order is delivered 
+            #self.Met = False # reset as order is delivered 
             self.deliver_order(timestep)  # action to deliver order 
             #self.resetCollab()
             return self.position  # CHANGED 
