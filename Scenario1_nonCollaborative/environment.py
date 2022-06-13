@@ -55,7 +55,7 @@ class WareHouse_Env():
         # create similar for loop as above 
 
         ##################################################################################################
-        ## NEWLY ADDED TODO: test and debug 
+      
         self.deliveryStations = []
         for deliveryStation in list(params["map"]["deliveryStation"]):
             self.deliveryStations.append(DeliveryStation(coordinate=deliveryStation))
@@ -149,7 +149,6 @@ class WareHouse_Env():
     def callForProposal(self, agent, order):
         """
         Return distance of agent to orders pickupstation
-        TODO doesnt consider obstacles, main should be used here.
         """
         return sqrt((order.getPickupStation()[0] - agent.getPosition()[0]) ** 2 + (
                     order.getPickupStation()[1] - agent.getPosition()[1]) ** 2)
@@ -175,11 +174,6 @@ class WareHouse_Env():
         
         for deliveryStation in self.deliveryStations:
             self.map[deliveryStation.getCoordinate()] = "D"
-
-        # Add meeting points 
-
-
-
 
         # Add agents
         for agent in self.agents:
