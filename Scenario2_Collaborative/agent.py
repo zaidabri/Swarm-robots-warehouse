@@ -156,11 +156,12 @@ class Agent:
             self.order = self.collab_order
             self.order.assign_order(self.agentId, timestep, self.order.getMeetingPoint())
             self.update_agent_state(5)
+            self.Met = True
 
         elif self.Picker: 
             self.order.deAssign_order()
             self.update_agent_state(0)
-
+            self.Met = True
 
     def setCollabOrder(self, order): 
         print("collab order function entered ")
@@ -208,30 +209,31 @@ class Agent:
         self.setOrder(order, timestep, ID)
 
     def makesMove(self, timestep, map):   # function which does the magicccc 
-        print("----------------------------***************")
-        print("agent Id", self.agentId)
-        print("state of the agent", self.state)
-        print("Picker", self.Picker)
-        print("Deliverer", self.Deliverer)
+        if self.Collaborating == True:
+            print("----------------------------***************")
+            print("agent Id", self.agentId)
+            print("state of the agent", self.state)
+            print("Picker", self.Picker)
+            print("Deliverer", self.Deliverer)
         
-        if self.order != None:
-            print("order", self.order.getOrderId())
+            if self.order != None:
+                print("order", self.order.getOrderId())
         
-        print("Agents Met ?", self.Met)
-        print("----------------------------***************")
+            print("Agents Met ?", self.Met)
+            print("----------------------------***************")
 
         if self.state == Agent_State._Done and self.position == self.goal:
             print("DONE HERE",self.state, Agent_State._Done)
             temp_dict = {"x": self.position[0], "y": self.position[1], "t": timestep}
             self.stepsHistory.append(temp_dict)# Save steps for visualization
             return self.position
-        elif self.state == Agent_State._Picking and self.position == self.goal and self.Picker == False:# Picks up good for order
+        elif self.state == Agent_State._Picking and self.position == self.goal and self.Picker == False and self.Collaborating == False:# Picks up good for order
             print("PICKING HERE",self.state, Agent_State._Picking)
             temp_dict = {"x": self.position[0], "y": self.position[1], "t": timestep}
             self.stepsHistory.append(temp_dict)# Save steps for visualization
             self.pick_order(timestep) # it' s ittttt  TODO 
             return self.position
-        elif self.state == Agent_State._Delivering and self.position == self.goal:# Delivers good
+        elif self.state == Agent_State._Delivering and self.position == self.goal and self.Collaborating == False:# Delivers good
             print("DELIVERING HERE",self.state, Agent_State._Delivering)
             temp_dict = {"x": self.position[0], "y": self.position[1], "t": timestep}
             self.stepsHistory.append(temp_dict)# Save steps for visualization
@@ -365,6 +367,7 @@ class Pair():  # the purpose is to make sure that once on of the agents has reac
             if self.agent1.getState() == Agent_State._Waiting and self.agent2.getState() == Agent_State._Waiting:
                 self.agent1.switch_order(timestep)
                 self.agent2.switch_order(timestep)
+
                 self.update_pair_state(0)
 
     def assign_agents(self, agent1, agent2, order, timestep):
