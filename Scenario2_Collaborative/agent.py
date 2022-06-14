@@ -28,12 +28,13 @@ class Agent:
         self.order_log = []
         self.order = None
         self.goal = position
+
         self.Collaborating = False
         self.collab_order = None 
         self.Picker = False 
         self.Deliverer = False 
-
         self.Met = False # The robots have not met, the class pair will take care of it 
+
         self.pathfinder = Pathfinder()
 
         # temp_dict = {"x": self.position[0], "y": self.position[1], "t": 0}
@@ -52,6 +53,7 @@ class Agent:
             self.Picker = True 
             self.collab_order = None 
             self.Deliverer = False 
+            order.assign_picker_agent(True)
         elif ctrl == 0: 
             print("Deliverer agent", self.agentId)
 
@@ -80,7 +82,12 @@ class Agent:
 
     # Check agent state by checking the order state TODO normally check state the other way agent --> order
     def update_agent_state(self, newState):
+
         print(newState, "new state into update agent state function")
+        print("agent is Picker ?", self.Picker, "agent is Deliverer ?", self.Deliverer)
+        if self.order != None:
+            print("order state ", self.order.get_order_state())
+
         if self.order == None and self.Deliverer == False and self.Picker == False:  # this oooneeeee 
             return
         elif newState == 0:# "_Done"
@@ -91,11 +98,20 @@ class Agent:
             self.order_switchcount += 1
             self.order_log.append(self.order.id_code)
             self.state = Agent_State._Picking
-            self.goal = self.order.get_objective()
+
+            if self.order.get_objective == False:
+                self.goal = self.startingPosition # check it if it gives the right objective 
+            else:
+                self.goal = self.order.get_objective()
             #print("self.pickupStation24", self.goal)
         elif newState == 2:# "_Delivering"
             self.state = Agent_State._Delivering
-            self.goal = self.order.get_objective()
+
+            if self.order.get_objective == False:
+                self.goal = self.startingPosition # check it if it gives the right objective 
+            else:
+                self.goal = self.order.get_objective()
+            print(self.order.get_order_state())
             #print("self.deliveryStation.coordinate34", self.goal)
         
         elif newState == 3 and self.Deliverer == True: # differentiate between agent ref and agent 2 
@@ -103,13 +119,21 @@ class Agent:
             self.state = Agent_State._Meeting
             print(self.state)
             print(self.collab_order)
-            self.goal = self.collab_order.get_objective() #-- Add coordinate of meeting point, how ??    # change it 
+
+            if self.collab_order.get_objective == False:
+                self.goal = self.startingPosition # check it if it gives the right objective 
+            else:
+                self.goal = self.collab_order.get_objective()#-- Add coordinate of meeting point, how ??    # change it 
         
         elif newState == 3 and self.Picker == True:
             print("new state for picker agent ")
             self.state = Agent_State._Meeting
-            goal = self.order.get_objective()
-            print("new goal",goal)
+            if self.order.get_objective == False:
+                self.goal = self.startingPosition
+                return # check it if it gives the right objective 
+            else:
+                goal = self.order.get_objective()  # TODO: check it 
+            print("new goal", goal)
             goal = list(goal)
             goal[0] = goal[0]-1 # ** this is needed otherwise the two robots would have the same coordinates as goal and therefore would never meet 
             goal = tuple(goal)
@@ -122,8 +146,11 @@ class Agent:
          
         elif newState == 5: # delivering collaborative order 
             self.state = Agent_State._DeliveringCollab
-            self.goal = self.order.get_objective()
-            
+            self.order.set_order_state(2) 
+            if self.order.get_objective == False:
+                self.goal = self.startingPosition # check it if it gives the right objective 
+            else:
+                self.goal = self.order.get_objective()
 
     def pick_order(self, timestep):
         self.order.set_order_state(2)
@@ -146,7 +173,7 @@ class Agent:
     def setOrder(self, order, timestep, ID):
         self.order = order
         self.pickupStation = order.pickupStation
-        self.order.assign_order(self.agentId, timestep, self.position)
+        self.order.assign_order(self.agentId, timestep, self.position, self.Deliverer, self.Picker)  #assign_order(self, agentId, agent ,timestep, agent_pos, Deliverer):
         #self.order.set_order_state(1)
         self.update_agent_state(1)
 
@@ -154,7 +181,7 @@ class Agent:
     def switch_order(self, timestep):
         if self.Deliverer: 
             self.order = self.collab_order
-            self.order.assign_order(self.agentId, timestep, self.order.getMeetingPoint())
+            self.order.assign_order(self.agentId, timestep, self.order.getMeetingPoint(), self.Deliverer, self.Picker)  # buggggg 
             self.update_agent_state(5)
             self.Met = True
 
@@ -209,7 +236,7 @@ class Agent:
         self.setOrder(order, timestep, ID)
 
     def makesMove(self, timestep, map):   # function which does the magicccc 
-        if self.Collaborating == True:
+        if self.Collaborating == True and self.state == Agent_State._Waiting or self.state == Agent_State._DeliveringCollab:
             print("----------------------------***************")
             print("agent Id", self.agentId)
             print("state of the agent", self.state)
@@ -221,6 +248,10 @@ class Agent:
         
             print("Agents Met ?", self.Met)
             print("----------------------------***************")
+
+        if self.Collaborating == False:
+            if self.order != None:
+                self.order.assign_picker_agent(False)
 
         if self.state == Agent_State._Done and self.position == self.goal:
             print("DONE HERE",self.state, Agent_State._Done)

@@ -54,6 +54,11 @@ class WareHouse_Env():
 
         # Set the world grid
         self.dimensions = params["map"]["dimensions"]
+        print(self.dimensions)
+
+        self.HalfMap = int(self.dimensions[0]/2)
+        print(self.HalfMap, "half map", "full map", self.dimensions[0])
+        # 
         self.map = numpy.zeros(self.dimensions, dtype=object)
 
         # Add pickupStation to list deliveryStation to the map
@@ -194,7 +199,10 @@ class WareHouse_Env():
                             winner.setOrder(order, timestep, winner.getId())
                             for i in range(len(self.order_list)):
                                 if order.getOrderId() == self.order_list[i].id_code:
-                                    self.order_list[i].agent_assigned = winner.getId()
+                                    self.order_list[i].assign_order(winner.getId(),timestep, winner.getPosition(), winner.Deliverer, winner.Picker)   #agent_assigned = winner.getId() 
+
+                                    #self.order_list[i].agent_assigned = winner.getId()
+
                             
                             print("setting order up")
                             
@@ -211,7 +219,7 @@ class WareHouse_Env():
                             winner.setOrder(order, timestep, winner.getId())
                             for i in range(len(self.order_list)):
                                 if order.getOrderId() == self.order_list[i].id_code:
-                                    self.order_list[i].agent_assigned = winner.getId() 
+                                    self.order_list[i].assign_order(winner.getId(), timestep, winner.getPosition(), winner.Deliverer, winner.Picker)   #agent_assigned = winner.getId() 
 
                     elif self.callForCollab(winner, order) == False: 
                         print("entered 5")
@@ -221,7 +229,9 @@ class WareHouse_Env():
                         winner.setOrder(order, timestep, winner.getId())
                         for i in range(len(self.order_list)):
                             if order.getOrderId() == self.order_list[i].id_code:
-                                self.order_list[i].agent_assigned = winner.getId() 
+                                self.order_list[i].assign_order(winner.getId(), timestep, winner.getPosition(), winner.Deliverer, winner.Picker)   #agent_assigned = winner.getId() 
+                                
+                                #self.order_list[i].agent_assigned = winner.getId() 
 
                     
 
@@ -270,18 +280,18 @@ class WareHouse_Env():
 
     def callForCollab(self, agent, order):
         # what is needed: order details, namely delivery station coordinates and assigned robot initial position 
-        if agent.getPosition()[0] > 25 and agent.getPosition()[0]< 50:
+        if agent.getPosition()[0] > self.HalfMap and agent.getPosition()[0]< self.dimensions[0]:   # TODO change range if you change map 
             ctrl = 1 
-        elif agent.getPosition()[0] > 0 and agent.getPosition()[0]< 26:
+        elif agent.getPosition()[0] > 0 and agent.getPosition()[0]< self.HalfMap:
             ctrl = 0 
 
-        if ctrl == 1 and order.deliveryStation[0] > 25: 
+        if ctrl == 1 and order.deliveryStation[0] > self.HalfMap: 
             return False
-        elif ctrl == 1 and order.deliveryStation[0] > 25: 
+        elif ctrl == 1 and order.deliveryStation[0] > self.HalfMap:   
             return True 
-        elif ctrl == 0 and order.deliveryStation[0] > 25: 
+        elif ctrl == 0 and order.deliveryStation[0] > self.HalfMap: 
             return True
-        elif ctrl == 0 and order.deliveryStation[0] > 25: 
+        elif ctrl == 0 and order.deliveryStation[0] > self.HalfMap: 
             return False  
         else: 
             return False # check if delivery station x - coordinate is within a certain threshold  < 25 , if not then create pairs 
@@ -301,10 +311,11 @@ class WareHouse_Env():
         # TODO --   CALCULATES ALL DIFFERENCES EXCEPT THE ONE WITH ONESELF
         for agentPos in self.agentsInitPos:  # check initial positions 
             value = 0
-            value = agentRef.getPosition()[1] - agentPos[2]  # check this TODO --- is it doing the calculation ? 
-            if abs(value) != 0 and agentRef.getId() != agentPos[0]:
-                differences.append(abs(value))
-                ids.append(agentPos[0])
+            if agentRef.getPosition()[0] != agentPos[1]: # make sure other agent is not on the same side 
+                value = agentRef.getPosition()[1] - agentPos[2]   
+                if agentRef.getId() != agentPos[0]:   
+                    differences.append(abs(value))
+                    ids.append(agentPos[0])
 
         print(differences, "differences values full list") 
         print("**************************************************")
@@ -316,7 +327,7 @@ class WareHouse_Env():
         minDiff = 0
         minDiffIndex = 0
 
-        while differences != empty: 
+        while len(differences) != 0:  # until we find a free agent or we are sure all the others are busy 
 
             for agent in self.agents:
                 minDiff = min(differences)  
@@ -563,6 +574,7 @@ if __name__ == "__main__":
     filehandler0.write("\n")
     filehandler0.close()
 
+    '''
     filehandlerA = open('agentStates.txt', 'a')
     filehandlerA.write(str(agentState))
     filehandlerA.write("\n")
@@ -572,7 +584,7 @@ if __name__ == "__main__":
     filehandlerP.write(str(pairsState))
     filehandlerP.write("\n")
     filehandlerP.close()
-
+    '''
     
 
     filehandler2 = open('maxdeliverytimeagents.txt', 'a')
