@@ -1,0 +1,406 @@
+
+
+average min distance 
+40.3
+average performed distance 
+46
+average loss 
+5.69
+max loss 
+5.69
+max simulation time 
+113
+average order changes 
+10.833333333333334
+
+
+average min distance 
+40.3
+average performed distance 
+46
+average loss 
+5.69
+max loss 
+5.69
+max simulation time 
+115
+average order changes 
+10.833333333333334
+
+
+average min distance 
+40.3
+average performed distance 
+46
+average loss 
+5.69
+max loss 
+5.69
+max simulation time 
+113
+average order changes 
+12.166666666666666
+
+
+average min distance 
+40.3
+average performed distance 
+46
+average loss 
+5.69
+max loss 
+5.69
+max simulation time 
+113
+average order changes 
+12.166666666666666
+
+
+average min distance 
+40.3
+average performed distance 
+46
+average loss 
+5.69
+max loss 
+5.69
+max simulation time 
+111
+average order changes 
+11.5
+
+
+average min distance 
+40.3
+average performed distance 
+42.857142857142854
+average loss 
+2.5471428571428576
+max loss 
+7.69
+max simulation time 
+122
+average order changes 
+11.833333333333334
+
+
+average min distance 
+40.3
+average performed distance 
+41
+average loss 
+0.6900000000000001
+max loss 
+7.69
+max simulation time 
+115
+average order changes 
+11
+
+
+average min distance 
+40.3
+average performed distance 
+40.75
+average loss 
+0.44000000000000006
+max loss 
+7.69
+max simulation time 
+113
+average order changes 
+11
+
+
+average min distance 
+40.3
+average performed distance 
+46.2
+average loss 
+5.890000000000001
+max loss 
+7.69
+max simulation time 
+138
+average order changes 
+13.333333333333334
+
+
+average min distance 
+40.3
+average performed distance 
+46.72727272727273
+average loss 
+6.417272727272728
+max loss 
+9.69
+max simulation time 
+145
+average order changes 
+14.5
+
+
+average min distance 
+40.3
+average performed distance 
+45.523809523809526
+average loss 
+5.213809523809524
+max loss 
+10.69
+max simulation time 
+290
+average order changes 
+45.833333333333336
+
+
+average min distance 
+40.3
+average performed distance 
+46.19047619047619
+average loss 
+5.880476190476191
+max loss 
+9.69
+max simulation time 
+267
+average order changes 
+26.333333333333332
+
+
+average min distance 
+40.3
+average performed distance 
+46.285714285714285
+average loss 
+5.975714285714286
+max loss 
+11.69
+max simulation time 
+269
+average order changes 
+29.333333333333332
+
+
+average min distance 
+40.3
+average performed distance 
+45.904761904761905
+average loss 
+5.594761904761905
+max loss 
+9.69
+max simulation time 
+261
+average order changes 
+26.666666666666668
+
+
+average min distance 
+40.3
+average performed distance 
+45.857142857142854
+average loss 
+5.547142857142857
+max loss 
+11.69
+max simulation time 
+275
+average order changes 
+32.333333333333336
+
+
+average min distance 
+39.27619047619047
+average performed distance 
+48.285714285714285
+average loss 
+9.005238095238095
+max loss 
+30.43
+max simulation time 
+292
+average order changes 
+29.333333333333332
+
+
+average min distance 
+39.27619047619047
+average performed distance 
+48.38095238095238
+average loss 
+9.10047619047619
+max loss 
+26.43
+max simulation time 
+288
+average order changes 
+27.5
+
+
+average min distance 
+39.27619047619047
+average performed distance 
+48.285714285714285
+average loss 
+9.005238095238095
+max loss 
+30.43
+max simulation time 
+292
+average order changes 
+27
+
+
+average min distance 
+39.27619047619047
+average performed distance 
+48.476190476190474
+average loss 
+9.195714285714287
+max loss 
+24.43
+max simulation time 
+273
+average order changes 
+27.166666666666668
+
+
+average min distance 
+39.27619047619047
+average performed distance 
+48.19047619047619
+average loss 
+8.91
+max loss 
+28.43
+max simulation time 
+273
+average order changes 
+28.333333333333332
+
+
+average min distance 
+39.27619047619047
+average performed distance 
+48.476190476190474
+average loss 
+9.195714285714287
+max loss 
+28.43
+max simulation time 
+298
+average order changes 
+29.833333333333332
+
+
+average min distance 
+39.27619047619047
+average performed distance 
+48.38095238095238
+average loss 
+9.10047619047619
+max loss 
+30.43
+max simulation time 
+281
+average order changes 
+28
+
+
+average min distance 
+39.27619047619047
+average performed distance 
+48.285714285714285
+average loss 
+9.005238095238095
+max loss 
+30.43
+max simulation time 
+292
+average order changes 
+28
+
+
+average min distance 
+39.27619047619047
+average performed distance 
+47
+average loss 
+7.7195238095238095
+max loss 
+24.43
+max simulation time 
+269
+average order changes 
+27
+
+
+average min distance 
+39.27619047619047
+average performed distance 
+47.80952380952381
+average loss 
+8.529047619047619
+max loss 
+26.43
+max simulation time 
+273
+average order changes 
+29.333333333333332
+
+
+average min distance 
+39.27619047619047
+average performed distance 
+46.61904761904762
+average loss 
+7.338571428571429
+max loss 
+24.43
+max simulation time 
+277
+average order changes 
+31.333333333333332
+
+
+average min distance 
+39.27619047619047
+average performed distance 
+48.38095238095238
+average loss 
+9.10047619047619
+max loss 
+28.43
+max simulation time 
+292
+average order changes 
+26.5
+
+
+average min distance 
+39.27619047619047
+average performed distance 
+48.19047619047619
+average loss 
+8.91
+max loss 
+26.43
+max simulation time 
+273
+average order changes 
+28.166666666666668
+
+
+average min distance 
+146.05714285714285
+average performed distance 
+175.23809523809524
+average loss 
+29.176666666666666
+max loss 
+83.01
+max simulation time 
+1054
+average order changes 
+91.33333333333333
