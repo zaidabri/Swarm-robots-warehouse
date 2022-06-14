@@ -21,3 +21,6 @@ https://user-images.githubusercontent.com/101090050/164981122-a18348d7-4a82-4fa0
 
 
 ## Scenario 2: collaborative multi-agent delivery
+
+
+[](https://github.com/mtilocca/Swarm-robots-warehouse/blob/main/Scenario2_Collaborative/outVideo.mp4)
