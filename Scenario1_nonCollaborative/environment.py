@@ -273,14 +273,14 @@ if __name__ == "__main__":
     # add delivery station to the list 
     for j in range(len(env.order_list)):
         E = env.order_list[j]
-        print("Order;", E.id_code, "; agent", E.agent_assigned, "; agent pos:", E.agent_pos, "; pickup:",
-              E.pickupStation,  "; delivery:", E.deliveryStation , "; d_required:", round(E.distance, 1), "; t_begin:", E.timestep_begin, "; t_pick:",
-              E.timestep_pick, "; t_end:", E.timestep_end, "; t_diff:", (E.timestep_pick - E.timestep_begin),
-              "; d_performed:", (E.timestep_end - E.timestep_pick), "; loss:",
-              round((E.timestep_end - E.timestep_pick - E.distance), 2))
+        #print("Order;", E.id_code, "; agent", E.agent_assigned, "; agent pos:", E.agent_pos, "; pickup:",
+         #     E.pickupStation,  "; delivery:", E.deliveryStation , "; d_required:", round(E.distance, 1), "; t_begin:", E.timestep_begin, "; t_pick:",
+         #     E.timestep_pick, "; t_end:", E.timestep_end, "; t_diff:", (E.timestep_pick - E.timestep_begin),
+         #     "; d_performed:", (E.timestep_end - E.timestep_pick), "; loss:",
+         #     round((E.timestep_end - E.timestep_pick - E.distance), 2))
 
             # Add delivery station to the metrics 
-
+        print(round((E.timestep_end - E.timestep_pick - E.distance), 2))
         # print("Order", E.id_code, " agent", E.agent_assigned)
         # print("agent pos:", E.agent_pos, "pickup: ", E.pickupStation, "distance: ", round( sqrt((E.agent_pos[0] - E.pickupStation[0])**2 + (E.agent_pos[1] - E.pickupStation[1])**2), 1))
         # print("quantity:", E.requested_quantities, " t_begin:", E.timestep_begin)

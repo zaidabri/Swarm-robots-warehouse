@@ -1,7 +1,7 @@
 from enum import Enum
 from numpy import sqrt
 from statistics import mean
-import sys
+
 
 import numpy
 import yaml
@@ -52,7 +52,9 @@ class WareHouse_Env():
             self.pickupStations.append(PickupStation(coordinate=pickupStation))
 
         # Add deliveryStation to list
-        self.deliveryStation = DeliveryStation(coordinate=tuple(params["map"]["deliveryStation"][0]))
+        self.deliveryStations =[]
+        for deliveryStation in list(params["map"]["deliveryStation"]):
+            self.deliveryStations.append(DeliveryStation(coordinate=deliveryStation))
 
         # Add obstacles to the map
         self.obstacles = []
@@ -62,7 +64,7 @@ class WareHouse_Env():
         # Create agents
         self.agents = []
         for agentId, d in enumerate(params["agents"]):
-            agent = Agent(d["name"], self.map, self.deliveryStation, position=tuple(d["start"]))
+            agent = Agent(d["name"], self.map, position=tuple(d["start"]))
             self.agents.append(agent)
 
         # Create Orders
@@ -73,8 +75,9 @@ class WareHouse_Env():
             quantity = params["order"]["orders_"][i]["requested_quantities"]
             timestep_begin = params["order"]["orders_"][i]["timestep"]
             PickUP = params["order"]["orders_"][i]["pickupStation"]
-            order = Order(self.deliveryStation.getCoordinate(), PickUP[0], quantity, timestep_begin, id_code)
-            print("ORDER", order.id_code, order.pickupStation, "quantity:", order.requested_quantities, "time_begin:",
+            Delivery = params["order"]["orders_"][i]["deliveryStation"]
+            order = Order(Delivery[0], PickUP[0], quantity, timestep_begin, id_code) #
+            print("ORDER", order.id_code, order.pickupStation, order.deliveryStation, "quantity:", order.requested_quantities, "time_begin:",
                   order.timestep_begin)
             self.order_list.append(order)
             # self.order_stats.append(order)
@@ -110,6 +113,21 @@ class WareHouse_Env():
         '''
             eCNP: All agents get orders proposed, also agent who already working on an order.
         '''
+        for order in self.order_list: #to turn off eCMP comment it out
+            if order.get_order_state() == 1 and order.getTimestep_begin() <= timestep:
+                winner = None
+                winnerDistance = None
+                for agent in self.agents:
+                    if agent.getState() == Agent_State._Done or agent.getState() == Agent_State._Picking:  # Agent is _Done
+                        distance = self.callForProposal(agent, order)
+                        if winner == None or distance < winnerDistance:
+                            winnerDistance = distance
+                            winner = agent
+                if winner != None:
+                    winner.setOrder(order, timestep, winner.getId())
+                    for i in range(len(self.order_list)):
+                        if order.getOrderId() == self.order_list[i].id_code:
+                            self.order_list[i].agent_assigned = winner.getId()
 
         # Let agents make their moves
         for agent in self.agents:
@@ -126,7 +144,6 @@ class WareHouse_Env():
     def callForProposal(self, agent, order):
         """
         Return distance of agent to orders pickupstation
-        TODO doesnt consider obstacles, main should be used here.
         """
         return sqrt((order.getPickupStation()[0] - agent.getPosition()[0]) ** 2 + (
                     order.getPickupStation()[1] - agent.getPosition()[1]) ** 2)
@@ -144,8 +161,8 @@ class WareHouse_Env():
         for obs in self.obstacles:
             self.map[obs] = "*"
 
-        # Add delivery station
-        self.map[self.deliveryStation.getCoordinate()] = "D"
+        for deliveryStation in self.deliveryStations:
+            self.map[deliveryStation.getCoordinate()] = "D"
 
         # Add pickup stations
         for pickupStation in self.pickupStations:
@@ -155,7 +172,7 @@ class WareHouse_Env():
         for agent in self.agents:
             if self.is_in_P_station(agent):
                 self.map[agent.getPosition()] = f"P@A{agent.agentId}"
-            elif agent.getPosition == self.deliveryStation.getCoordinate():
+            elif self.is_in_D_station(agent):
                 self.map[agent.getPosition()] = f"D@A{agent.agentId}"
             else:
                 self.map[agent.getPosition()] = f"A{agent.getId()}"
@@ -167,6 +184,12 @@ class WareHouse_Env():
     def is_in_P_station(self, agent):
         for pickupStation in self.pickupStations:
             if pickupStation.getCoordinate() == agent.getPosition():
+                return True
+        return False
+
+    def is_in_D_station(self, agent):
+        for deliveryStation in self.deliveryStations:
+            if deliveryStation.getCoordinate() == agent.getPosition():
                 return True
         return False
 
@@ -214,7 +237,7 @@ def write_output_file(output_file, output):
 
 
 if __name__ == "__main__":
-    input_file = sys.argv[1]
+    input_file = "./input.yaml"
     env = WareHouse_Env(input_config_file=input_file)
     timestep = 0
     while True:
@@ -230,14 +253,6 @@ if __name__ == "__main__":
     totallist = []
     deliverytimelist = []
     waitingtimelist = []
-    t_difflist = []
-    losslist = []
-    maxdeliverylist = []
-    dperformedlist = []
-    mindistancelist = []
-    performeddistancelist = []
-    simulationtimelist = []
-
     for j in range(len(env.order_list)):
         E = env.order_list[j]
         print("Order;", E.id_code, "; agent", E.agent_assigned, "; agent pos:", E.agent_pos, "; pickup:",
@@ -255,16 +270,6 @@ if __name__ == "__main__":
         totallist.append(E.timestep_end - E.timestep_begin)
         waitingtimelist.append(E.timestep_pick - E.timestep_begin)
         deliverytimelist.append(E.timestep_end - E.timestep_pick)
-        t_difflist.append(E.timestep_pick - E.timestep_begin) #DISTANCE T_DIFF
-
-        maxdeliverylist.append(E.timestep_end)
-        dperformedlist.append((E.timestep_end - E.timestep_pick))
-
-        mindistancelist.append(round(E.distance, 1))
-        performeddistancelist.append((E.timestep_end - E.timestep_pick))
-        losslist.append(round((E.timestep_end - E.timestep_pick - E.distance), 2))  # losslist
-        simulationtimelist.append(E.timestep_end)
-
 
     orderchangelist = []
     for agent in env.agents:
@@ -280,45 +285,5 @@ if __name__ == "__main__":
     write_output_file("./output.yaml", env.output)
     print(" avg delivery: " + str(mean(deliverytimelist)) + " avg total: " + str(
         mean(totallist)) + " avg waitinglist: " + str(mean(waitingtimelist)))
-
-    print(sys.argv[1])
-
-    #filehandler0 = open('noECNPaverageorderswitches.txt', 'a')
-    #filehandler0.write(str(mean(orderchangelist)) + '''
-    #''')
-    #filehandler0.close()
-    #filehandler2 = open('noECNPmaxdeliverytimeagents.txt', 'a')
-    #filehandler2.write(str(max(maxdeliverylist)) + '''
-    #''')
-    #filehandler2.close()
-    #filehandler3 = open('noECNPaveragelosstime.txt', 'a')
-    #filehandler3.write(str(mean(losslist)) + '''
-    #''')
-    #filehandler3.close()
-
-    #filehandler4 = open('npECNPaverage_d_performed.txt', 'a')
-    #filehandler4.write(str(mean(dperformedlist)) + '''
-    #''')
-    #filehandler4.close()
-
-    #filehandler5 = open('noCNP_Exp_mapArea_results.txt', 'a')
-    #filehandler5.write(sys.argv[1] + '''
-    #''')
-    # average min distance
-    #filehandler5.write(str(mean(mindistancelist)) + '''
-    #''')
-    #average performed distance
-    #filehandler5.write(str(mean(performeddistancelist)) + '''
-    #''')
-    #average loss
-    #filehandler5.write(str(mean(losslist)) + '''
-    #''')
-    #max loss
-    #filehandler5.write(str(max(losslist)) + '''
-    #''')
-    #max simulation time
-    #filehandler5.write(str(max(simulationtimelist)) + '''
-    #''')
-    #average order changes
-    #filehandler5.write(str(mean(orderchangelist)) + '''
-    #''')
+    filehandler = open('averagedeliverytimenow.txt', 'w')
+    filehandler.write(str(mean(totallist)))
