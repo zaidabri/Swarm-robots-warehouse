@@ -233,7 +233,22 @@ class WareHouse_Env():
                                 
                                 #self.order_list[i].agent_assigned = winner.getId() 
 
-                    
+                    elif self.callForCollab(winner, order) == 1: 
+
+                        Done_agents = []
+                        for agent in self.agents:
+                            if agent.getState() == Agent_State._Done:
+                                Done_agents.append()
+                        
+                        if len(Done_agents) == 1: 
+                            winner.resetCollab()
+                            winner.setOrder(order, timestep, winner.getId())
+                            for i in range(len(self.order_list)):
+                                if order.getOrderId() == self.order_list[i].id_code:
+                                    self.order_list[i].assign_order(winner.getId(), timestep, winner.getPosition(), winner.Deliverer, winner.Picker)   #agent_assigned = winner.getId() 
+                        
+                        elif len(Done_agents) > 1: 
+                            winner = None  # to be assigned to another agent       
 
 
         '''
@@ -285,16 +300,27 @@ class WareHouse_Env():
         elif agent.getPosition()[0] > 0 and agent.getPosition()[0]< self.HalfMap:
             ctrl = 0 
 
-        if ctrl == 1 and order.deliveryStation[0] > self.HalfMap: 
+        if ctrl == 1 and order.deliveryStation[0] > self.HalfMap and order.pickupStation[0] > self.HalfMap: # A2 O4
             return False
-        elif ctrl == 1 and order.deliveryStation[0] > self.HalfMap:   
+        elif ctrl == 1 and order.deliveryStation[0] < self.HalfMap and order.pickupStation[0] > self.HalfMap:   # A2 O3 
             return True 
-        elif ctrl == 0 and order.deliveryStation[0] > self.HalfMap: 
+
+        elif ctrl == 1 and order.deliveryStation[0] < self.HalfMap and order.pickupStation[0] < self.HalfMap: # A2 O2 
+            return 1
+        elif ctrl == 1 and order.deliveryStation[0] > self.HalfMap and order.pickupStation[0] < self.HalfMap: # A1 O1 
+            return 1 
+
+        elif ctrl == 0 and order.deliveryStation[0] > self.HalfMap and order.pickupStation[0] < self.HalfMap: # A1 O1
             return True
-        elif ctrl == 0 and order.deliveryStation[0] > self.HalfMap: 
+        elif ctrl == 0 and order.deliveryStation[0] < self.HalfMap and order.pickupStation[0] < self.HalfMap: # A1 O2 
             return False  
+
+        elif ctrl == 0 and order.deliveryStation[0] < self.HalfMap and order.pickupStation[0] > self.HalfMap: # A1 O3 
+            return 1 
+        elif ctrl == 0 and order.deliveryStation[0] > self.HalfMap and order.pickupStation[0] > self.HalfMap: # A1 O4 
+            return 1 
         else: 
-            return False # check if delivery station x - coordinate is within a certain threshold  < 25 , if not then create pairs 
+            return 1 # check if delivery station x - coordinate is within a certain threshold  < self.HalfMap , if not then create pairs 
         
 
     def findThePair(self, agentRef):  # agentRef is the agent to which the order has been assigned 
@@ -330,21 +356,24 @@ class WareHouse_Env():
         while len(differences) != 0:  # until we find a free agent or we are sure all the others are busy 
 
             for agent in self.agents:
-                minDiff = min(differences)  
-                print("**************************************************")
-                print(minDiff, "difference min ") 
-                minDiffIndex = differences.index(minDiff)
+                if len(differences) > 0:
+                    minDiff = min(differences)  
+                    print("**************************************************")
+                    print(minDiff, "difference min ") 
+                    minDiffIndex = differences.index(minDiff)
 
-                if ids[minDiffIndex] == agent.getId() and ids and differences:
-                    candidate = agent
-                    if is_not_busy(candidate):
-                        print("Pair found! for ",agentRef.getId(),"paired with :", candidate.getId())
-                        return candidate 
-                    elif is_not_busy(candidate) == False:
-                        differences.remove(minDiff)
+                    if ids[minDiffIndex] == agent.getId() and ids and differences:
+                        candidate = agent
+                        if is_not_busy(candidate):
+                            print("Pair found! for ",agentRef.getId(),"paired with :", candidate.getId())
+                            return candidate 
+                        elif is_not_busy(candidate) == False:
+                            differences.remove(minDiff)
                         ids.remove(ids[minDiffIndex])
-                elif differences == [] and ids == []: # if all agents are busy then it is impossible to pair 
-                        print("All agents busy, sorry")
+                    elif differences == [] and ids == []: # if all agents are busy then it is impossible to pair 
+                            print("All agents busy, sorry")
+                else:
+                    return False
 
         return False
         
