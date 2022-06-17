@@ -8,9 +8,12 @@ import yaml
 import random
 
 from agent import Agent, Agent_State
-from AGV import Order, Order_State  # what is order ?  Could AGV.py be the file they refer to ? 
+from AGV import Order, Order_State  
 
-
+'''
+Object used to store the information regarding the pick up stations in the initialization of
+the environment class from the data in the input file 
+'''
 class PickupStation():
     def __init__(self, coordinate):
         self.coordinate = coordinate
@@ -18,7 +21,10 @@ class PickupStation():
     def getCoordinate(self):
         return self.coordinate
 
-
+'''
+Object used to store the information regarding the Delivery stations in the initialization of
+the environment class from the data in the input file 
+'''
 class DeliveryStation():
     def __init__(self, coordinate):
         self.coordinate = coordinate
@@ -51,10 +57,7 @@ class WareHouse_Env():
         for pickupStation in list(params["map"]["pickupStation"]):
             self.pickupStations.append(PickupStation(coordinate=pickupStation))
 
-        # Add deliveryStation to list
-        # create similar for loop as above 
 
-        ##################################################################################################
       
         self.deliveryStations = []
         for deliveryStation in list(params["map"]["deliveryStation"]):
@@ -73,19 +76,17 @@ class WareHouse_Env():
 
         # Create Orders
         self.order_list = []
-        # self.order_stats = []
-        # add delivery station in order details 
         for i in range(len(params["order"]["orders_"])):  # Create as many orders as total_orders
             id_code = params["order"]["orders_"][i]["id_code"]
             quantity = params["order"]["orders_"][i]["requested_quantities"]
             timestep_begin = params["order"]["orders_"][i]["timestep"]
             PickUP = params["order"]["orders_"][i]["pickupStation"]
-            Delivery = params["order"]["orders_"][i]["deliveryStation"]  # added line 
-            order = Order(Delivery[0], PickUP[0], quantity, timestep_begin, id_code) # check --- 
+            Delivery = params["order"]["orders_"][i]["deliveryStation"]  
+            order = Order(Delivery[0], PickUP[0], quantity, timestep_begin, id_code)
             print("ORDER", order.id_code, order.pickupStation, order.deliveryStation, "quantity:", order.requested_quantities, "time_begin:",
                   order.timestep_begin)
             self.order_list.append(order)
-            # self.order_stats.append(order)
+            
 
         # Check if all agents are done
         self._done = False
@@ -97,7 +98,8 @@ class WareHouse_Env():
 
         # Assign orders to agents
         '''
-            CNP: Orders are distributed here. Agent bid with distance to pickup station of order.
+         Orders are distributed here. Agent bid with distance to pickup station of order.
+         In a bid the agent closest to the order gets the order.
         '''
         for order in self.order_list:
             if order.get_order_state() == 0 and order.getTimestep_begin() <= timestep:
@@ -115,24 +117,6 @@ class WareHouse_Env():
                         if order.getOrderId() == self.order_list[i].id_code:
                             self.order_list[i].agent_assigned = winner.getId()
 
-        '''
-            eCNP: All agents get orders proposed, also agent who already working on an order.
-        '''
-        for order in self.order_list: #to turn off eCMP comment it out
-            if order.get_order_state() == 1 and order.getTimestep_begin() <= timestep:
-                winner = None
-                winnerDistance = None
-                for agent in self.agents:
-                    if agent.getState() == Agent_State._Done or agent.getState() == Agent_State._Picking:  # Agent is _Done
-                        distance = self.callForProposal(agent, order)
-                        if winner == None or distance < winnerDistance:
-                            winnerDistance = distance
-                            winner = agent
-                if winner != None:
-                    winner.setOrder(order, timestep, winner.getId())
-                    for i in range(len(self.order_list)):
-                        if order.getOrderId() == self.order_list[i].id_code:
-                            self.order_list[i].agent_assigned = winner.getId()
 
         # Let agents make their moves
         for agent in self.agents:
@@ -244,17 +228,20 @@ def write_output_file(output_file, output):
     with open(output_file, 'w') as output_yaml:
         yaml.safe_dump(output, output_yaml)
 
-
 if __name__ == "__main__":
-    input_file ="./input.yaml" #sys.argv[1]
+    input_file ="input.yaml" 
     env = WareHouse_Env(input_config_file=input_file)
     timestep = 0
+
+    agentState =[]
+    pairsState = []
+
     while True:
         env.step(timestep)
 
         timestep += 1
-
-        if timestep > 10000000 or env.allOrdersDone():
+        
+        if timestep > 500 or env.allOrdersDone():  
             print("Done with", timestep, "timesteps.")
             break
 
@@ -270,7 +257,7 @@ if __name__ == "__main__":
     performeddistancelist = []
     simulationtimelist = []
 
-    # add delivery station to the list 
+    
     for j in range(len(env.order_list)):
         E = env.order_list[j]
         #print("Order;", E.id_code, "; agent", E.agent_assigned, "; agent pos:", E.agent_pos, "; pickup:",

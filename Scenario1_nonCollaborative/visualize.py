@@ -15,7 +15,15 @@ import math
 
 Colors = ['orange', 'blue', 'green']
 
+'''
+This visualization layer is strongly based on the framework provided in: 
 
+https://github.com/atb033/multi_agent_path_planning
+
+based on the input file and the output file where the schedule of the each robot movement at each time step is present, 
+this script is able to recreate a video or animation of the simulation
+
+'''
 class Animation:
   def __init__(self, map, schedule):
     self.map = map

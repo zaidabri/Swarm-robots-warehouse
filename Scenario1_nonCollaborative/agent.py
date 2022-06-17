@@ -9,6 +9,17 @@ class Agent_State(Enum):
     _Picking = 1
     _Delivering = 2
 
+
+'''
+The agent layer is one of the two main ones together with the environment. 
+a number of Agent objects is created by the environment once it reads the configuration file. 
+
+Based on the information of the input file each agent can be initialized with 
+
+- a unique id 
+- a unique position in the map 
+'''
+
 class Agent:
 
     def __init__(self, agentId, map, position):
@@ -47,7 +58,12 @@ class Agent:
     def getStepsHistory(self):
         return self.stepsHistory
 
-    # Check agent state by checking the order state TODO normally check state the other way agent --> order
+    '''
+    Main function responsible for updating the agent state and goal. The function is called by the self.MakesMove function 
+    when the agent has reached a goal or when an order is assigned. either collaborative or not. 
+
+    Input: the value of the new state corresponding to the AGENT_STATE 
+    '''
     def update_agent_state(self, newState):
         if self.order == None:
             return
@@ -66,11 +82,23 @@ class Agent:
             self.goal = self.order.get_objective()
             #print("self.deliveryStation.coordinate34", self.goal)
 
+    '''
+    When the agent has reached the pick up point this function has the goal to update the agent state and communicate with the order
+    layer the pick up the order by changing the order state  and registering the time-step of pick up 
+    '''
+
     def pick_order(self, timestep):
         self.order.set_order_state(2)
         self.order.timestep_pick = timestep
         self.update_agent_state(2)
         #print("Order ", self.order.id_code , " picked by agent", self.agentId, ". New Goal: ", self.goal)
+
+
+
+    '''
+    When the agent has reached the Delivery point this function has the goal to update the agent state and communicate with the order
+    layer the Delivery the order by changing the order state  and registering the time-step of the Delivery
+    '''
 
     def deliver_order(self, timestep):
         self.order.set_order_state(3)
@@ -85,13 +113,11 @@ class Agent:
         #self.order.set_order_state(1)
         self.update_agent_state(1)
 
-    def setNewOrder(self, order, timestep, ID):
-        '''
-        eCNP: Agent accepts new order, and removes the old one
-        '''
-        self.order.deAssign_order()
-        self.setOrder(order, timestep, ID)
 
+    '''
+    Main function called at each time step for every agent in the environment layer.  It links the agent layer to the environment, 
+    the order and path finding layer 
+    '''
     def makesMove(self, timestep, map):
 
         if self.state == Agent_State._Done and self.position == self.goal:
@@ -113,15 +139,15 @@ class Agent:
             return self.position
 
         # Find next step
-        print("self.goal)", self.goal)
+        #print("self.goal)", self.goal)
         x, y = self.pathfinder.solve(self.agentId ,map.copy(), self.position, self.goal)
 
         self.position = (x, y)
-        #self.state = Agent_State._Active
+       
 
         # Save steps for visualization
         temp_dict = {"x": self.position[0], "y": self.position[1], "t": timestep}
         self.stepsHistory.append(temp_dict)
 
-        print("End of MakesMove:", self.position)
+        #print("End of MakesMove:", self.position)
         return self.position

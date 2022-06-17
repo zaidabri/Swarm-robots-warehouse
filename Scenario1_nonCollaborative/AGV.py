@@ -9,8 +9,23 @@ class Order_State(Enum):
     _Picked  = 2
     _Delivered = 3
 
+
+'''
+An object of class order is created by the environment layer following the data in the input file for each of the orders present 
+in the input file 
+'''
+
 class Order:
-    current_objective = ()
+    #current_objective = ()
+
+    '''
+    Inputs: 
+     - coordinates of the delivery station 
+     - coordinates of the pick up station 
+     - coordinates of the meeting point 
+     - quantities of the order needed to sort 
+     - timestep of initialization 
+    '''
 
     def __init__(self, deliveryStation, pickupStation, requested_quantities, timestep_begin, id_code, state=0):
         self.id_code = id_code
@@ -27,20 +42,18 @@ class Order:
         self.agentId = None
         self.timestep_of_assignment = None
 
+
+    '''
+    function used to assign the order: 
+    register where the agent is and change the order state to assigned 
+    '''
+
     def assign_order(self, agentId, timestep, agent_pos):
         self.agentId = agentId
         self.state = 1
         self.timestep_of_assignment = timestep
         self.agent_pos = agent_pos
 
-    def deAssign_order(self):
-        
-        '''
-        Used for eCNP to remove assignment of order.
-        '''
-        self.agentId = None
-        self.state = 0
-        self.timestep_of_assignment = None
 
     def getTimestep_begin(self):
         return self.timestep_begin
