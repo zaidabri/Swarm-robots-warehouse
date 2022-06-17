@@ -19,8 +19,14 @@ Execute both: python3 warehouse.py && python3 visualize.py<br>
 
 https://user-images.githubusercontent.com/101090050/164981122-a18348d7-4a82-4fa0-b542-797332762318.mp4
 
+##### flow chart scenario 1 
+![Code1](https://user-images.githubusercontent.com/101090050/174080912-48cb4d75-a190-4b25-b15d-b9fe31b80f4f.png)
+
 
 ## Scenario 2: collaborative multi-agent delivery
 
 
-[](https://github.com/mtilocca/Swarm-robots-warehouse/blob/main/Scenario2_Collaborative/outVideo.mp4)
+
+
+https://user-images.githubusercontent.com/101090050/173695695-16ee0691-7a35-4a3d-b834-073b317f350e.mp4
+
