@@ -10,7 +10,10 @@ import random
 from agent import Agent, Agent_State, Pair, Pair_State
 from AGV import Order, Order_State  
 
-
+'''
+Object used to store the information regarding the pick up stations in the initialization of
+the environment class from the data in the input file 
+'''
 class PickupStation():
     def __init__(self, coordinate):
         self.coordinate = coordinate
@@ -18,7 +21,10 @@ class PickupStation():
     def getCoordinate(self):
         return self.coordinate
 
-
+'''
+Object used to store the information regarding the Delivery stations in the initialization of
+the environment class from the data in the input file 
+'''
 class DeliveryStation():
     def __init__(self, coordinate):
         self.coordinate = coordinate
@@ -29,7 +35,10 @@ class DeliveryStation():
 
 
 
-#changed
+'''
+Object used to store the information regarding the meeting points in the initialization of
+the environment class from the data in the input file 
+'''
 class MeetingPoint():
     def __init__(self, coordinate):
         self.coordinate = coordinate
@@ -42,7 +51,7 @@ class WareHouse_Env():
     def __init__(self, input_config_file, render=True):
         """
         Creates a grid world of a warehouse, where multiples agents are supposed to collect items from pickup station
-        and bring them to the delivery station. The Warehouse contains also obstacles
+        and bring them to the delivery station. The Warehouse contains also obstacles and meeting points for the robots 
 
         :param input_config_file: yaml file that contains the word configuration
         """
@@ -56,6 +65,7 @@ class WareHouse_Env():
         self.dimensions = params["map"]["dimensions"]
         print(self.dimensions)
 
+        # parameter used as reference in the collaborative function to see where the agent is 
         self.HalfMap = int(self.dimensions[0]/2)
         print(self.HalfMap, "half map", "full map", self.dimensions[0])
         # 
@@ -66,11 +76,7 @@ class WareHouse_Env():
         for pickupStation in list(params["map"]["pickupStation"]):
             self.pickupStations.append(PickupStation(coordinate=pickupStation))
 
-        # Add deliveryStation to list
-        # create similar for loop as above 
-
-        ##################################################################################################
-        ## NEWLY ADDED TODO: test and debug 
+        # Add deliveryStation Add pickupStation to list deliveryStation to the map
         self.deliveryStations = []
         for deliveryStation in list(params["map"]["deliveryStation"]):
             self.deliveryStations.append(DeliveryStation(coordinate=deliveryStation))
@@ -91,13 +97,14 @@ class WareHouse_Env():
             agent = Agent(d["name"], self.map, position=tuple(d["start"]))
             self.agents.append(agent)
 
+        # Store agents init position
         self.agentsInitPos = []
 
         for agent in self.agents: 
             startX = agent.getPosition()[0]
             startY = agent.getPosition()[1]
             idAg = agent.getId()
-            self.agentsInitPos.append([idAg, startX, startY])  # storing the init position of each agent 
+            self.agentsInitPos.append([idAg, startX, startY])  # storing the init position of each agent and its id 
 
         # create pairs 
         m = int(len(self.agents)/2)
@@ -106,125 +113,111 @@ class WareHouse_Env():
         for i in range(m): 
             self.pairs.append(Pair(i))
 
-        print(self.pairs)
+        
 
         # Create Orders
         self.order_list = []
-        # self.order_stats = []
-        # add delivery station in order details 
         for i in range(len(params["order"]["orders_"])):  # Create as many orders as total_orders
             id_code = params["order"]["orders_"][i]["id_code"]
             quantity = params["order"]["orders_"][i]["requested_quantities"]
             timestep_begin = params["order"]["orders_"][i]["timestep"]
             PickUP = params["order"]["orders_"][i]["pickupStation"]
-            Delivery = params["order"]["orders_"][i]["deliveryStation"]  # added line 
-            MeetingPoints = params["order"]["orders_"][i]["meetingPoint"]  # added line 
-            order = Order(Delivery[0], PickUP[0], MeetingPoints[0], quantity, timestep_begin, id_code) # check --- #CHANGED
+            Delivery = params["order"]["orders_"][i]["deliveryStation"]  
+            MeetingPoints = params["order"]["orders_"][i]["meetingPoint"]  
+            order = Order(Delivery[0], PickUP[0], MeetingPoints[0], quantity, timestep_begin, id_code) 
             print("Initialization pt 1")
             print("ORDER", order.id_code, order.pickupStation, order.deliveryStation, order.meetingPoint,"quantity:", order.requested_quantities, "time_begin:",
                   order.timestep_begin)
             
             self.order_list.append(order)
-            #print("Initialization pt 2")
-            # self.order_stats.append(order)
+            
 
-        #print("------------------------------------------------------------------------------------------")
-        #print("length of order list", len(self.order_list))
-        #print("first element of the list", self.order_list[0])
-        #print("list type ", type(self.order_list[0]))
-        # Check if all agents are done
+        # control variable changed to TRUE when all orders are sorted and delivered 
         self._done = False
-        #print("------------------------------------------------------------------------------------------")
         
-        #print("agents: type", type(self.agents[0]))
-        #print(self.agents)
-        #print("orders : type", type(self.order_list[0]))
-        #print(self.order_list)
-        #print("------------------------------------------------------------------------------------------")
 
-        random.shuffle(self.order_list)
+        # orders are agents are randomly shuffled so that each order can potentially be assigned to each agent 
+        random.shuffle(self.order_list)  
         random.shuffle(self.agents)
-        #print("------------------------------------------------------------------------------------------")
+        
 
-        '''
-        print("Entering")
-        print("agents reshuffled : type ", type(self.agents[0]))
-        print(self.agents)
-        print("orders reshuffled : type ", type(self.order_list[0]))
-        print(self.order_list)
-        print("Exiting")
-        print("------------------------------------------------------------------------------------------")
-
-        '''
+        
+        
         # Render in Terminal option
         self.renderMap(0)
 
+    
+    '''
+    Main function used when running the entire program in a loop until all orders are sorted or the simualtion
+    has taken longer than the max time steps decided by the user 
+    '''
+
     def step(self, timestep):
 
-        # Assign orders to agents
         '''
-            CNP: Orders are distributed here. Agent bid with distance to pickup station of order.
+        Assign orders until all agents are busy or orders have all been assigned. 
+        It is important to note that some orders can be assigned also later on during the simulation thanks to order.getTimestep_begin. 
         '''
         for order in self.order_list:
             if order.get_order_state() == 0 and order.getTimestep_begin() <= timestep:
                 winner = None
-                winnerDistance = None
-                for agent in self.agents: # shuffle the agents so that it's more random TODO 
-                    if agent.getState() == Agent_State._Done:  # Agent is _Done
-                        #distance = self.callForProposal(agent, order)
-                        if winner == None: #or distance < winnerDistance:
-                            #winnerDistance = distance
+                for agent in self.agents: # A random agent which is non busy is assigned a random order 
+                    if agent.getState() == Agent_State._Done:  # Agent is _Done and available reagrdless of its current location
+                        
+                        if winner == None:
                             winner = agent
                            
-                if winner != None:   # reorganize the structure so that it works also when there is no collaborartion either for the order or either for the non availability.
-                    # check if order should be collaborative 
-                    if self.callForCollab(winner, order) == True : 
-                        print("entered")
+                if winner != None:   # once an ordeer is assigned it is checked if it is a collab order 
+                    if self.callForCollab(winner, order) == True : # if collaborative find a pairable agent 
+                        #print("entered")
                         agent2 = self.findThePair(winner)
                         if agent2 != False: 
-                            print("entered 2")
                             print("winner of order assign", winner.getId(), "second agent", agent2.getId())
                             for pair in self.pairs:
-                                print("entered 3")
-                                print(pair.getState())
-                                if pair.getState() == Pair_State._Available:  # enters 3 times, while it should enter only 1 
-                                    print("entered 4")
+                                
+                                if pair.getState() == Pair_State._Available:  # find an available pair to take care of the collab order 
+                                    
                                     pair.assign_agents(winner, agent2, order, timestep)# pair creation 
-                                    #print("")
+                                    
                                     break
                             
                             
-                            winner.resetCollab()
-                            agent2.resetCollab()
-                            winner.setOrder(order, timestep, winner.getId())
+                            winner.resetCollab() # reset collab order params in case of previous assignment 
+                            agent2.resetCollab() 
+
+                            winner.setOrder(order, timestep, winner.getId()) # Assign order to main winning agent 
                             for i in range(len(self.order_list)):
                                 if order.getOrderId() == self.order_list[i].id_code:
-                                    self.order_list[i].assign_order(winner.getId(),timestep, winner.getPosition(), winner.Deliverer, winner.Picker)   #agent_assigned = winner.getId() 
+                                    self.order_list[i].assign_order(winner.getId(),timestep, winner.getPosition(), winner.Deliverer, winner.Picker)   
 
                                     #self.order_list[i].agent_assigned = winner.getId()
 
                             
-                            print("setting order up")
+                           
                             
                             winner.setCollab_state(1, order) # setting collaboration within robots 
-                            print("order set up for agent 1 ", winner.getState())
+                            #print("order set up for agent 1 ", winner.getState())
                         
                             agent2.setCollab_state(0, order)
-                            print("order set up for agent 2 ", agent2.getState())
+                            #print("order set up for agent 2 ", agent2.getState())
 
 
-                        elif agent2 == False:
-                            print("entered 1")
+                        # if the order is collaborative but all other agents are busy then agent completes assignment alone 
+                        elif agent2 == False: 
+                            
                             winner.resetCollab()
                             winner.setOrder(order, timestep, winner.getId())
                             for i in range(len(self.order_list)):
                                 if order.getOrderId() == self.order_list[i].id_code:
                                     self.order_list[i].assign_order(winner.getId(), timestep, winner.getPosition(), winner.Deliverer, winner.Picker)   #agent_assigned = winner.getId() 
-
+                        
+                        
+                        '''
+                        Order is non collaborative: Eg. agent is positioned on the right side and pick up and delivery station are also on the 
+                        right side 
+                        '''
                     elif self.callForCollab(winner, order) == False: 
-                        print("entered 5")
-                        print(winner.getId(), order)
-                        print('-------------------------------')
+                        
                         winner.resetCollab()
                         winner.setOrder(order, timestep, winner.getId())
                         for i in range(len(self.order_list)):
@@ -233,10 +226,19 @@ class WareHouse_Env():
                                 
                                 #self.order_list[i].agent_assigned = winner.getId() 
 
+
+                        '''
+                        Third order and agent location possibility:
+                        Eg. the agent is on the right side and both delivery and pick up staion of the order are on the left side
+                        as this would completely on the opposite side normally the order is not assigned to the robot. 
+
+                        However in case it is the only robot available to optimize the overall efficiency the robot is assigned the order anyway
+                
+                        '''
                     elif self.callForCollab(winner, order) == 1: 
 
                         Done_agents = []
-                        for agent in self.agents:
+                        for agent in self.agents:  # Checl how many agents are _Done 
                             if agent.getState() == Agent_State._Done:
                                 Done_agents.append()
                         
@@ -251,41 +253,18 @@ class WareHouse_Env():
                             winner = None  # to be assigned to another agent       
 
 
-        '''
-            eCNP: All agents get orders proposed, also agent who already working on an order.
-        '''
-
-        '''
-        for order in self.order_list: #to turn off eCMP comment it out
-            if order.get_order_state() == 1 and order.getTimestep_begin() <= timestep:
-                winner = None
-                winnerDistance = None
-                for agent in self.agents:
-                    if agent.getState() == Agent_State._Done or agent.getState() == Agent_State._Picking:  # Agent is _Done
-                        distance = self.callForProposal(agent, order)
-                        if winner == None or distance < winnerDistance:
-                            winnerDistance = distance
-                            winner = agent
-                         # created the first time it runs and resets per every order. 
-                if winner != None:
-                    winner.setOrder(order, timestep, winner.getId())
-                    for i in range(len(self.order_list)):
-                        if order.getOrderId() == self.order_list[i].id_code:
-                            self.order_list[i].agent_assigned = winner.getId()
-        '''
+        
         # Let agents make their moves
         for agent in self.agents:  # here ? 
             self.map[agent.getPosition()[0], agent.getPosition()[1]] = 0  # Reset position of agent
             agent.makesMove(timestep, self.map)
             self.renderMap(timestep)
 
-
+        # Pairs make their moves
         for pair in self.pairs:
             pair.MakesMove(timestep)
         
-        # same thing as above but for the Pair class   
-        # TODO: create 3 pairs and do not initialize them -- follow same pattern as for order for assignment ( put the agents) and de assignment when order is delivered 
-
+      
 
         # Print for console
         self.renderMap(timestep, False)
@@ -293,9 +272,15 @@ class WareHouse_Env():
         # Save history
         self.save_stepHistory()
 
+    '''
+    Every time an agent is assigned an order the function scans if it should a collaborative order, a normal order or due to distance constraints
+    the agent should not be assigned it . 
+
+    The logic for the decision scheme is based on the system model figure presented in the report. 
+    '''
     def callForCollab(self, agent, order):
-        # what is needed: order details, namely delivery station coordinates and assigned robot initial position 
-        if agent.getPosition()[0] > self.HalfMap and agent.getPosition()[0]< self.dimensions[0]:   # TODO change range if you change map 
+        
+        if agent.getPosition()[0] > self.HalfMap and agent.getPosition()[0]< self.dimensions[0]:   
             ctrl = 1 
         elif agent.getPosition()[0] > 0 and agent.getPosition()[0]< self.HalfMap:
             ctrl = 0 
@@ -320,36 +305,41 @@ class WareHouse_Env():
         elif ctrl == 0 and order.deliveryStation[0] > self.HalfMap and order.pickupStation[0] > self.HalfMap: # A1 O4 
             return 1 
         else: 
-            return 1 # check if delivery station x - coordinate is within a certain threshold  < self.HalfMap , if not then create pairs 
+            return 1  
         
-
+    
+    '''
+    When an order is indeed collaborative this function is responible for finding an agent to pair 
+    '''
     def findThePair(self, agentRef):  # agentRef is the agent to which the order has been assigned 
         
-        def is_not_busy(agent):  # 
+        def is_not_busy(agent):  # internal function which checks that an agent is not busy 
             if agent.getState() == Agent_State._Done:
                 return True
             else:
                 return False
 
-        differences = []
+        differences = [] # a list where the differences in distances on the y-axis of the agents opposite to the winner is created 
         ids = []
         value = 0 
-        # TODO --   CALCULATES ALL DIFFERENCES EXCEPT THE ONE WITH ONESELF
+        
+
         for agentPos in self.agentsInitPos:  # check initial positions 
             value = 0
             if agentRef.getPosition()[0] != agentPos[1]: # make sure other agent is not on the same side 
                 value = agentRef.getPosition()[1] - agentPos[2]   
-                if agentRef.getId() != agentPos[0]:   
+                if agentRef.getId() != agentPos[0]:   # just in case agent does not get paired with itself 
                     differences.append(abs(value))
                     ids.append(agentPos[0])
 
-        print(differences, "differences values full list") 
-        print("**************************************************")
-        print(ids, "ids corresponding to the min differences ")  # is the order correct ? 
-        #TODO -- finish to implement the pair matching 
+        '''
         # find min difference -- check if agent is not busy, if not then return the found agent, if 
-        # agent is busy find the other one which is closest and on the other side and so on, make it in a for loop which scans it 
+        # agent is busy find the other one which is closest and on the other side and so on
+        # every time an agent is busy then it is removed from the list of possible candidates. 
 
+        Eg. closest agent is busy, the second closest will be the next taken into consideration 
+
+        '''
         minDiff = 0
         minDiffIndex = 0
 
@@ -358,8 +348,6 @@ class WareHouse_Env():
             for agent in self.agents:
                 if len(differences) > 0:
                     minDiff = min(differences)  
-                    print("**************************************************")
-                    print(minDiff, "difference min ") 
                     minDiffIndex = differences.index(minDiff)
 
                     if ids[minDiffIndex] == agent.getId() and ids and differences:
@@ -378,35 +366,7 @@ class WareHouse_Env():
         return False
         
         
-        
-            
-            
-    def createPair(self, agentRef):
-        
-        agent2 = self.findThePair(agentRef)
 
-        if agent2 == False:
-            return False 
-        else:
-            #self.pairIDs = [[agentRef, agent2]] # store it 
-            return agentRef.getId(), agent2.agentId # the pair is created based on the agents which lay within the same horizontal line 
-
-
-    def BothRobotMet(self, agent1, agent2):
-        # function shold check that both robots are at the meeting points to change 'winner' 
-        if self.is_in_M_station(agent1) and self.is_in_M_station(agent2):
-            return True 
-        else: 
-            return False 
-
-
-    def callForProposal(self, agent, order):
-        """
-        Return distance of agent to orders pickupstation
-    
-        """
-        return sqrt((order.getPickupStation()[0] - agent.getPosition()[0]) ** 2 + (
-                    order.getPickupStation()[1] - agent.getPosition()[1]) ** 2)
 
     # Render stations
     def renderMap(self, timestep, printBool=False):
@@ -430,7 +390,7 @@ class WareHouse_Env():
         for deliveryStation in self.deliveryStations:
             self.map[deliveryStation.getCoordinate()] = "D"
 
-        #CHANGED
+        
         # Add meeting points 
         for meetingPoint in self.meetingPoints:
             self.map[meetingPoint.getCoordinate()] = "M"  
@@ -461,8 +421,7 @@ class WareHouse_Env():
             if deliveryStation.getCoordinate() == agent.getPosition():
                 return True 
         return False
-    #CHANGED
-    # similar logic for meeting points 
+     
     def is_in_M_station(self, agent):
         for meetingpoints in self.meetingPoints:
             if meetingpoints.getCoordinate() == agent.getPosition():
@@ -492,7 +451,6 @@ class WareHouse_Env():
         if self.order_list != []:
             return False
         for agent in self.agents:
-            # print("agent.state != Agent_State._Done", agent.state, Agent_State._Done, agent.state != Agent_State._Done)
             if agent.state != Agent_State._Done:
                 return False
         return True
@@ -513,7 +471,7 @@ def write_output_file(output_file, output):
 
 
 if __name__ == "__main__":
-    input_file ="input.yaml" #sys.argv[1]
+    input_file ="input.yaml" 
     env = WareHouse_Env(input_config_file=input_file)
     timestep = 0
 
@@ -525,11 +483,11 @@ if __name__ == "__main__":
 
         timestep += 1
         
-        if timestep > 500 or env.allOrdersDone():  # debugging 
+        if timestep > 500 or env.allOrdersDone():  
             print("Done with", timestep, "timesteps.")
             break
 
-    # Print results
+    # Print results 
     totallist = []
     deliverytimelist = []
     waitingtimelist = []
@@ -597,23 +555,15 @@ if __name__ == "__main__":
         mean(totallist)) + " avg waitinglist: " + str(mean(waitingtimelist)))
 
     #print(sys.argv[1])
+    
 
+    '''
+    save metrics of the simulation for data analysis 
+    '''
     filehandler0 = open('averageorderswitches.txt', 'a')
     filehandler0.write(str(mean(orderchangelist)))
     filehandler0.write("\n")
     filehandler0.close()
-
-    '''
-    filehandlerA = open('agentStates.txt', 'a')
-    filehandlerA.write(str(agentState))
-    filehandlerA.write("\n")
-    filehandlerA.close()
-
-    filehandlerP = open('PairsStates.txt', 'a')
-    filehandlerP.write(str(pairsState))
-    filehandlerP.write("\n")
-    filehandlerP.close()
-    '''
     
 
     filehandler2 = open('maxdeliverytimeagents.txt', 'a')
