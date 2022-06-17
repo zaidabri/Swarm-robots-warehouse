@@ -1,9 +1,6 @@
-#python3 visualize.py input.yaml output.yaml
 
-#!/usr/bin/env python3
 import yaml
 import matplotlib
-# matplotlib.use("Agg")
 from matplotlib.patches import Circle, Rectangle, Arrow
 from matplotlib.collections import PatchCollection
 import matplotlib.pyplot as plt
@@ -15,7 +12,15 @@ import math
 
 Colors = ['orange', 'blue', 'green']
 
+'''
+This visualization layer is strongly based on the framework provided in: 
 
+https://github.com/atb033/multi_agent_path_planning
+
+based on the input file and the output file where the schedule of the each robot movement at each time step is present, 
+this script is able to recreate a video or animation of the simulation
+
+'''
 class Animation:
   def __init__(self, map, schedule):
     self.map = map
@@ -54,15 +59,15 @@ class Animation:
       x, y = o[0], o[1]
       self.patches.append(Rectangle((x - 0.5, y - 0.5), 1, 1, facecolor='red', edgecolor='red'))
 
-    for o in map["map"]["pickupStation"]:
+    for o in map["map"]["pickupStation"]:  # create pick up stations 
         x, y = o[0], o[1]
         self.patches.append(Rectangle((x - 0.5, y - 0.5), 1, 1, facecolor='blue', edgecolor='blue'))
 
-    for o in map["map"]["deliveryStation"]:
+    for o in map["map"]["deliveryStation"]: # create delivery stations 
         x, y = o[0], o[1]
         self.patches.append(Rectangle((x - 0.5, y - 0.5), 1, 1, facecolor='yellow', edgecolor='yellow'))
     
-    for o in map["map"]["meetingPoint"]:
+    for o in map["map"]["meetingPoint"]: # create meeting points 
         x, y = o[0], o[1]
         self.patches.append(Rectangle((x - 0.5, y - 0.5), 1, 1, facecolor='green', edgecolor='green'))
 
