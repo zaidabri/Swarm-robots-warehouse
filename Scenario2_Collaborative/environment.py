@@ -537,9 +537,6 @@ if __name__ == "__main__":
             if (first != second):
                 i = i + 1
 
-        
-        print("agent:", agent.agentId, ", number of order-changes:", agent.order_switchcount, ', unequal changes: ', i)
-        orderchangelist.append(i)
 
     for agent in env.agents:
             agentState.append([agent.state, agent.agentId, "\n"])
@@ -549,10 +546,10 @@ if __name__ == "__main__":
             pairsState.append([pair.agent1.getId(), "Picker",pair.agent1.Picker ,pair.agent1.getState(), pair.agent2.getId(), "Deliverer",pair.agent2.Deliverer, pair.agent2.getState(), "\n"])
 
 
-    print('average order switches ' + str(mean(orderchangelist)))
+    #print('average order switches ' + str(mean(orderchangelist)))
     write_output_file("./output.yaml", env.output)
-    print(" avg delivery: " + str(mean(deliverytimelist)) + " avg total: " + str(
-        mean(totallist)) + " avg waitinglist: " + str(mean(waitingtimelist)))
+    #print(" avg delivery: " + str(mean(deliverytimelist)) + " avg total: " + str(
+    #   mean(totallist)) + " avg waitinglist: " + str(mean(waitingtimelist)))
 
     #print(sys.argv[1])
     
@@ -560,10 +557,6 @@ if __name__ == "__main__":
     '''
     save metrics of the simulation for data analysis 
     '''
-    filehandler0 = open('averageorderswitches.txt', 'a')
-    filehandler0.write(str(mean(orderchangelist)))
-    filehandler0.write("\n")
-    filehandler0.close()
     
 
     filehandler2 = open('maxdeliverytimeagents.txt', 'a')
@@ -611,14 +604,4 @@ if __name__ == "__main__":
     filehandler5.write("max simulation time \n")
     filehandler5.write(str(max(simulationtimelist)))
     filehandler5.write("\n")
-
-
-
-    filehandler5.write("average order changes \n")
-    filehandler5.write(str(mean(orderchangelist)))
-    filehandler5.write("\n")
-
-  #'''
-
-
     filehandler5.close()

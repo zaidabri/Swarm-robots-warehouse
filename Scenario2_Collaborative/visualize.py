@@ -186,6 +186,7 @@ if __name__ == "__main__":
 
   #CHANGE
   animation = Animation(map, schedule)
+  animation.show()
   animation.save("outVideo.mp4", 4)
   # if args.video:
   #   animation.save(args.video, args.speed)
