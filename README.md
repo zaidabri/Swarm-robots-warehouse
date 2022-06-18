@@ -9,7 +9,7 @@ In the first case the agents are assigned the orders based on a distance optimiz
 
 In the second case the agents are assigned orders randomly and based on distance constraints another agent to collaborate with is paired with it. 
 
-For both scenarios the library tcod is used to calculate through the ** A star** algorithm the shortest path from its position to the current goal
+For both scenarios the library tcod is used to calculate through the ** A star ** algorithm the shortest path from its position to the current goal
 
 ### Commands
 
