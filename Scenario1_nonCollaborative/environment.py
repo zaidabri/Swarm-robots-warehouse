@@ -267,7 +267,7 @@ if __name__ == "__main__":
          #     round((E.timestep_end - E.timestep_pick - E.distance), 2))
 
             # Add delivery station to the metrics 
-        print(round((E.timestep_end - E.timestep_pick - E.distance), 2))
+        print(E.id_code, round((E.timestep_end - E.timestep_pick - E.distance), 2))
         # print("Order", E.id_code, " agent", E.agent_assigned)
         # print("agent pos:", E.agent_pos, "pickup: ", E.pickupStation, "distance: ", round( sqrt((E.agent_pos[0] - E.pickupStation[0])**2 + (E.agent_pos[1] - E.pickupStation[1])**2), 1))
         # print("quantity:", E.requested_quantities, " t_begin:", E.timestep_begin)
@@ -294,20 +294,14 @@ if __name__ == "__main__":
             if (first != second):
                 i = i + 1
 
-        print("agent:", agent.agentId, ", number of order-changes:", agent.order_switchcount, ', unequal changes: ', i)
-        orderchangelist.append(i)
-
-    print('average order switches ' + str(mean(orderchangelist)))
+    
     write_output_file("./output.yaml", env.output)
     print(" avg delivery: " + str(mean(deliverytimelist)) + " avg total: " + str(
         mean(totallist)) + " avg waitinglist: " + str(mean(waitingtimelist)))
 
     #print(sys.argv[1])
 
-    filehandler0 = open('averageorderswitches.txt', 'a')
-    filehandler0.write(str(mean(orderchangelist)))
-    filehandler0.write("\n")
-    filehandler0.close()
+    
 
     filehandler2 = open('maxdeliverytimeagents.txt', 'a')
     filehandler2.write(str(max(maxdeliverylist)))
@@ -355,13 +349,6 @@ if __name__ == "__main__":
     filehandler5.write(str(max(simulationtimelist)))
     filehandler5.write("\n")
 
-
-
-    filehandler5.write("average order changes \n")
-    filehandler5.write(str(mean(orderchangelist)))
-    filehandler5.write("\n")
-
-  #'''
 
 
     filehandler5.close()
