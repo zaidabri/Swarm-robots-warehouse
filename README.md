@@ -1,4 +1,4 @@
-# Swarm-robots-warehouse
+# Multi-agent warehouse order sorting 
 
 This project consists in the development of a distributed system where a multi-agent order sorting in a simulated warehouse is presented. 
 The project is divided into 2 scenarios. 
@@ -18,7 +18,7 @@ To easily execute the program follow these 4 steps:
 1. Install dependency: `python3 -m pip install --user tcod`
 2. Execute simulation: `python3 environment.py`
 3. Execute visualization: `python3 visualize.py`
-4. Execute both: python3 `environment.py && python3 visualize.py`
+4. Execute both: `python3 environment.py && python3 visualize.py`
 
 ----------
 ## Scenario 1: non collaborative multi-agent delivery 
