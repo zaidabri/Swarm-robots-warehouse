@@ -1,5 +1,3 @@
-
-
 average min distance 
 40.3
 average performed distance 
