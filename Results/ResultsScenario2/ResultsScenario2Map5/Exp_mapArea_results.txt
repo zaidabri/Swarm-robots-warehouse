@@ -1,0 +1,13 @@
+
+
+average min distance 
+40.3
+average performed distance 
+52.57142857142857
+average loss 
+12.26142857142857
+max loss 
+58.69
+max simulation time 
+242
+
